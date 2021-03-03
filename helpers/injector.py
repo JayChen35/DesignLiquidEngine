@@ -69,47 +69,47 @@ def input_variables():
     print("Please list them in the order they are listed at the top of the file, i.e. \n Thrust=___ \n Chamber Pressure=___ \n . \n . \n .")
     
     file_ext = input("Enter file path with .txt: ")
-    vars = dict()
+    data = dict()
     try:
         with open(file_ext) as f:
             for line in f:
                 equal_index = line.find("=")
                 name = line[:equal_index].strip()
                 value = float(line[equal_index+1:].strip())
-                vars[name] = value
+                data[name] = value
     except IOError:
         print("Please ensure input.txt is named correctly and in the correct directory.")
     except ValueError:
         print("Please ensure inputs are entered as floats with no other text in the file")
-    print(vars)
-    P3 = get_exit_pressure(vars["altitude"])
-    vars["P3"] = P3
-    return vars
+    print(data)
+    P3 = get_exit_pressure(data["altitude"])
+    data["P3"] = P3
+    return data
 
 
 
 
-def calculate(vars):
+def calculate(data):
     """
     Attempts to calculate and print values.
     """
     try:  # Attempt to calculate values
-        mdot = vars["mdot"]
-        OF = vars["o/f"]
+        mdot = data["mdot"]
+        OF = data["o/f"]
         mdot_o = mdot * OF/(OF+1)
         mdot_f = mdot * 1/(OF+1)
-        rho_f = vars["rho_f"]
-        rho_o = vars["rho_o"]
-        P0 = vars["P0"]
-        delta_p = vars["delta_p"]
-        og_d_o = vars["og_d_o"]
-        Cd_o = vars["Cd_o"]
-        og_d_f = vars["og_d_f"]
-        Cd_f = vars["Cd_f"]
-        imp_angle = vars["imp_angle"]
-        M = vars["M"]
-        jet_LD = vars["jet_LD"]
-        orifice_LD = vars["orifice_LD"]
+        rho_f = data["rho_f"]
+        rho_o = data["rho_o"]
+        P0 = data["P0"]
+        delta_p = data["delta_p"]
+        og_d_o = data["og_d_o"]
+        Cd_o = data["Cd_o"]
+        og_d_f = data["og_d_f"]
+        Cd_f = data["Cd_f"]
+        imp_angle = data["imp_angle"]
+        M = data["M"]
+        jet_LD = data["jet_LD"]
+        orifice_LD = data["orifice_LD"]
 
         diam_ratio = np.sqrt(M * (((rho_o/rho_f)*(mdot_o/mdot_f)**2)**0.7))
         
@@ -142,41 +142,41 @@ def calculate(vars):
         d_man_f = (d_com_o/L_poi_o) * (L_inj + L_poi_o)
         d_man_o = (d_com_f/L_poi_f) * (L_inj + L_poi_f)
 
-        vars["diam_ratio"] = diam_ratio
-        vars["mdot_o_orifice"] = mdot_o_orifice
-        vars["mdot_f_orifice"] = mdot_f_orifice
-        vars["n_o"] = n_o
-        vars["n_f"] = n_f
-        vars["d_o"] = d_o
-        vars["d_f"] = d_f
-        vars["a_o"] = a_o
-        vars["a_f"] = a_f
-        vars["L_jet_o"] = L_jet_o
-        vars["L_jet_f"] = L_jet_f
-        vars["L_poi_o"] = L_poi_o
-        vars["L_poi_f"] = L_poi_f
-        vars["L_inj"] = L_inj
-        vars["d_com_f"] = d_com_f
-        vars["d_man_o"] = d_man_o
-        vars["d_man_f"] = d_man_f
-        vars["d_man_o"] = d_man_o
+        data["diam_ratio"] = diam_ratio
+        data["mdot_o_orifice"] = mdot_o_orifice
+        data["mdot_f_orifice"] = mdot_f_orifice
+        data["n_o"] = n_o
+        data["n_f"] = n_f
+        data["d_o"] = d_o
+        data["d_f"] = d_f
+        data["a_o"] = a_o
+        data["a_f"] = a_f
+        data["L_jet_o"] = L_jet_o
+        data["L_jet_f"] = L_jet_f
+        data["L_poi_o"] = L_poi_o
+        data["L_poi_f"] = L_poi_f
+        data["L_inj"] = L_inj
+        data["d_com_f"] = d_com_f
+        data["d_man_o"] = d_man_o
+        data["d_man_f"] = d_man_f
+        data["d_man_o"] = d_man_o
     except (ValueError, ZeroDivisionError):  # Exception thrown
         print("\n", "Error while attempting to solve. Please enter a valid value for every parameter.")
     
-    return vars
+    return data
 
 
 def print_out():
-    for key in vars:
-        print(f"{key} = {vars[key]}")
+    for key in data:
+        print(f"{key} = {data[key]}")
 
-def injector_main(vars):
-    calculate(vars)
+def injector_main(data):
+    calculate(data)
 
 
 if __name__ == "__main__":
     py_dir = os.path.dirname(__file__)
     os.chdir(py_dir)
-    vars = input_variables()
-    calculate(vars)
-    print_outputs(vars)
+    data = input_variables()
+    calculate(data)
+    print_outputs(data)

@@ -79,21 +79,21 @@ def input_variables():
     print("Please list them in the order they are listed at the top of the file, i.e. \n Thrust=___ \n Chamber Pressure=___ \n . \n . \n .")
     
     file_ext = input("Enter file path with .txt: ")
-    vars = dict()
+    data = dict()
     try:
         with open(file_ext) as f:
             for line in f:
                 equal_index = line.find("=")
                 name = line[:equal_index].strip()
                 value = float(line[equal_index+1:].strip())
-                vars[name] = value
+                data[name] = value
     except IOError:
         print("Please ensure input.txt is named correctly and in the correct directory.")
     except ValueError:
         print("Please ensure inputs are entered as floats with no other text in the file")
-    print(vars)
-    vars["P3"] = get_exit_pressure(vars["altitude"])
-    return vars
+    print(data)
+    data["P3"] = get_exit_pressure(data["altitude"])
+    return data
 
 def get_exit_pressure(h: int or float):
     """
@@ -117,19 +117,19 @@ def get_exit_pressure(h: int or float):
 
 
 
-def calculate(vars):
+def calculate(data):
     """
     Attempts to calculate and print values.
     """
-    F = vars["thrust"]
-    P0 = vars["P0"]
-    ALT = vars["altitude"]
-    P3 = vars["P3"]
-    OF = vars["o/f"]
-    T0 = vars["T0"]
-    M = vars["M"]
-    k = vars["GAMMA"]
-    Lstar = vars['Lstar']
+    F = data["thrust"]
+    P0 = data["P0"]
+    ALT = data["altitude"]
+    P3 = data["P3"]
+    OF = data["o/f"]
+    T0 = data["T0"]
+    M = data["M"]
+    k = data["GAMMA"]
+    Lstar = data['Lstar']
 
     try:  # Attempt to calculate values
         R = (8314.3 / M)
@@ -155,44 +155,44 @@ def calculate(vars):
         Ldn = ((Re) - (Rt)) / (np.tan(np.deg2rad(15)))
         Lcn = ((Rc) - (Rt)) / (np.tan(np.deg2rad(45)))
 
-        vars["R"] = R
-        vars["PR"] = PR
-        vars["AR"] = AR
-        vars["ER"] = ER
-        vars["Tt"] = Tt
-        vars["v2"] = v2
-        vars["mdot"] = mdot
-        vars["mdot_fuel"] = mdot_fuel
-        vars["mdot_oxidizer"] = mdot_oxidizer
-        vars["Isp"] = Isp
-        vars["Te"] = Te
-        vars["Mnum"] = Mnum
-        vars["At"] = At
-        vars["Ae"] = Ae
-        vars["Rt"] = Rt
-        vars["Re"] = Re
-        vars["Ac"] = Ac
-        vars["Rc"] = Rc
-        vars["Lc"] = Lc
-        vars["Ldn"] = Ldn
-        vars["Lcn"] = Lcn
+        data["R"] = R
+        data["PR"] = PR
+        data["AR"] = AR
+        data["ER"] = ER
+        data["Tt"] = Tt
+        data["v2"] = v2
+        data["mdot"] = mdot
+        data["mdot_fuel"] = mdot_fuel
+        data["mdot_oxidizer"] = mdot_oxidizer
+        data["Isp"] = Isp
+        data["Te"] = Te
+        data["Mnum"] = Mnum
+        data["At"] = At
+        data["Ae"] = Ae
+        data["Rt"] = Rt
+        data["Re"] = Re
+        data["Ac"] = Ac
+        data["Rc"] = Rc
+        data["Lc"] = Lc
+        data["Ldn"] = Ldn
+        data["Lcn"] = Lcn
 
     except (ValueError, ZeroDivisionError):  # Exception thrown
         print("\n", "Error while attempting to solve. Please enter a valid value for every parameter.")
 
-def print_outputs(vars):
-    for key in vars:
-        print(f"{key} = {vars[key]}")
+def print_outputs(data):
+    for key in data:
+        print(f"{key} = {data[key]}")
 
 
-def nozzle_main(vars):
-    calculate(vars)
+def nozzle_main(data):
+    calculate(data)
 
 
 
 if __name__ == "__main__":
     py_dir = os.path.dirname(__file__)
     os.chdir(py_dir)
-    vars = input_variables()
-    calculate(vars)
-    print_outputs(vars)
+    data = input_variables()
+    calculate(data)
+    print_outputs(data)

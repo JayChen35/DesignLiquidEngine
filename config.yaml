@@ -1,0 +1,19 @@
+---
+thrust : 3000 # [N] Thrust
+of_ratio : 4 # [~] Oxidizer-to-fuel ratio
+P0 : 3000000 # [Pa] Chamber pressure
+altitude : 500 # [m] Operational altitude
+frozen : true # [~] Frozen/equilibrium combusion
+temp : 298 # [K] Ambient temperature 
+Lstar : 1.25 # [m] Mixing length
+rho_o : 772.75 # [kg/m^3] Density of oxidizer
+rho_f : 789 # [kg/m^3] Density of fuel
+delta_p : 25.0 # [~] % of injector/chamber dP
+og_d_o : 1.58 # [mm] Diameter of oxidizer orifices
+og_d_f : 1.00 # [mm] Diameter of fuel orifices
+Cd_o : 0.9 # [~] Discharge coefficent of ox
+Cd_f : 0.88 # [~] Discharge coefficent of fuel
+imp_angle : 60 # [deg] Orifice impingement angle
+M : 1.6 # [~] 2-on-1 doublet M coefficient
+jet_LD : 6 # [~] Jet length/diameter ratio
+orifice_LD : 7 # [~] Orifice length/diameter ratio

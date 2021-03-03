@@ -32,21 +32,21 @@ def input_variables():
     
     file_ext = input("Enter file path with .txt: ")
     file_name = file_ext.split(".")[0]
-    vars = dict()
+    data = dict()
     try:
         with open(file_ext) as f:
             for line in f:
                 equal_index = line.find("=")
                 name = line[:equal_index].strip()
                 value = float(line[equal_index+1:].strip())
-                vars[name] = value
+                data[name] = value
     except IOError:
         print("Please ensure input.txt is named correctly and in the correct directory.")
     except ValueError:
         print("Please ensure inputs are entered as floats with no other text in the file")
-    vars["P3"] = get_exit_pressure(vars["altitude"])
+    data["P3"] = get_exit_pressure(data["altitude"])
     ceagui_name = file_name + "_ceagui"
-    return vars, ceagui_name
+    return data, ceagui_name
 
 
 def get_exit_pressure(h: int or float):
@@ -69,27 +69,27 @@ def get_exit_pressure(h: int or float):
     return P3
 
 
-def ceagui_inp(vars, ceagui_name):
+def ceagui_inp(data, ceagui_name):
     cea_exe_dir = "./CEAexec/cea-exec/"
-    pressure_ratio = round(vars["P0"] / vars["P3"], 3)
-    frozen = "frozen nfz=1" if bool(vars["frozen"]) else "equilibrium"
+    pressure_ratio = round(data["P0"] / data["P3"], 3)
+    frozen = "frozen nfz=1" if bool(data["frozen"]) else "equilibrium"
     # Make the file
     with open(cea_exe_dir + ceagui_name + ".inp", "w+") as f:
-        line_1 = f"problem  case={ceagui_name} o/f={vars['o/f']},\n"
+        line_1 = f"problem  case={ceagui_name} o/f={data['o/f']},\n"
         f.write(line_1)
         line_2 = f"      rocket  {frozen}\n"
         f.write(line_2)
-        line_3 = f"  p,bar={vars['P0']/100000},\n"
+        line_3 = f"  p,bar={data['P0']/100000},\n"
         f.write(line_3)
         line_4 = f"  pi/p={pressure_ratio},\n"
         f.write(line_4)
         line_5 = "react\n"
         f.write(line_5)
-        line_6 = f"  fuel=C2H5OH(L) wt=95  t,k={vars['temp']}\n"
+        line_6 = f"  fuel=C2H5OH(L) wt=95  t,k={data['temp']}\n"
         f.write(line_6)
-        line_7 = f"  fuel=H2O(L) wt=5  t,k={vars['temp']}\n"
+        line_7 = f"  fuel=H2O(L) wt=5  t,k={data['temp']}\n"
         f.write(line_7)
-        line_8 = f"  oxid=N2O wt=100  t,k={vars['temp']}\n"
+        line_8 = f"  oxid=N2O wt=100  t,k={data['temp']}\n"
         f.write(line_8)
         line_9 = "end"
         f.write(line_9)
@@ -115,7 +115,7 @@ def driver_cea(ceagui_name):
    
 
 
-def cea_outparse(ceagui_name, vars):
+def cea_outparse(ceagui_name, data):
     cea_exe_dir = "./CEAexec/cea-exec/"
     csv_filename = f"{ceagui_name}.csv"
     cea_filename = f"{ceagui_name}.out"
@@ -155,29 +155,29 @@ def cea_outparse(ceagui_name, vars):
         file_writer.writerow(vals)
         i = 3
         while i < 8:
-            vars[row[i].split()[0]] = float(vals[i]) 
+            data[row[i].split()[0]] = float(vals[i]) 
             i += 1
     print("Operation complete. CSV file saved to {}".format(csv_filename))
 
 
-def print_outputs(vars):
-    for key in vars:
-        print(f"{key} = {round(vars[key], 3)}")
+def print_outputs(data):
+    for key in data:
+        print(f"{key} = {round(data[key], 3)}")
 
 
 
-def cea_main(vars, ceagui_name):
-    ceagui_inp(vars, ceagui_name)
+def cea_main(data, ceagui_name):
+    ceagui_inp(data, ceagui_name)
     driver_cea(ceagui_name)
-    cea_outparse(ceagui_name, vars)
+    cea_outparse(ceagui_name, data)
 
 if __name__ == "__main__":
     py_dir = os.path.dirname(__file__)
     os.chdir(py_dir)
     temp = input_variables()
-    vars = temp[0]
+    data = temp[0]
     ceagui_name = temp[1]
-    ceagui_inp(vars, ceagui_name)
+    ceagui_inp(data, ceagui_name)
     driver_cea(ceagui_name)
-    cea_outparse(ceagui_name, vars)
-    print_outputs(vars)
+    cea_outparse(ceagui_name, data)
+    print_outputs(data)
