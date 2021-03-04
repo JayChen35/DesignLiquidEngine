@@ -7,54 +7,71 @@
 
 import numpy as np
 import os
-from helpers.cea import cea_main, get_exit_pressure
+import yaml
+import sys
+import time
+import datetime
+from helpers.misc import get_exit_pressure, print_header
+from helpers.cea import cea_main
 from helpers.nozzle import nozzle_main
 from helpers.injector import injector_main
-import yaml
 
 
-def take_all_inputs():
-    print("Input variables using a .txt file. Enter floats only. Ensure file is within folder of .py file.")
-    print("Please list them in the order they are listed at the top of the file, i.e. \n Thrust=___ \n Chamber Pressure=___ \n . \n . \n .")
-    
-    file_ext = input("Enter file path with .txt: ")
-    file_name = file_ext.split(".")[0]
-    data = dict()
-    try:
-        with open(file_ext) as f:
-            for line in f:
-                equal_index = line.find("=")
-                name = line[:equal_index].strip()
-                value = float(line[equal_index+1:].strip())
-                data[name] = value
-    except IOError:
-        print("Please ensure input.txt is named correctly and in the correct directory.")
-    except ValueError:
-        print("Please ensure inputs are entered as floats with no other text in the file")
+def main() -> dict:
+    # Ingest user parameters and store into data{} dictionary.
+    terminal = False
+    while not terminal:
+        print("Enter configuration (parameter) file path, including .yaml extension (e.g. \"config.yaml\").")
+        print("Alternatively, press [ENTER] to use default file (./config.yaml), or [0] to exit.")
+        temp_path = input("File path: ")
+        try:
+            if temp_path == "":
+                temp_path = "./config.yaml"
+            elif temp_path == "0":
+                sys.exit(0)
+            with open(temp_path, "r") as f:
+                data = yaml.safe_load(f)
+                assert type(data) == dict
+                terminal = True
+        except IOError or ValueError or AssertionError:
+            print_header("Invalid file path. Please ensure the file path is typed correctly.")
+    input_path = temp_path
+    # Get ambient pressure given the input altitude
     data["P3"] = get_exit_pressure(data["altitude"])
-    ceagui_name = file_name + "_ceagui"
-    return data, ceagui_name
+    # Get desired name of output/case files from user
+    temp_name = input("Enter the desired name of output/case files (press [ENTER] to use default): ")
+    if temp_name == "":
+        case_name = datetime.datetime.now().strftime("%d-%b-%Y_%H%M%S") + "EST"
+    else:
+        case_name = "".join([x if(x.isalnum() or x in "._- ") else "_" for x in temp_name])
+    # Change current working directory to ./helpers
+    os.chdir("./helpers")
+    # Run Chemical Equilibrium with Applications (CEA) interface code
+    data = cea_main(data, case_name)
+    # Run nozzle design code (assuming quasi-1D isentropic flow)
+    data = nozzle_main(data)
+    # Run injector design code (assuming 2-on-1 doublet impinging injector)
+    data = injector_main(data)
+    # Print calculation outputs
+    for key, val in data.items():
+        print(f"{key} = {val}")
+    return data
 
 
-def print_header(string, key=lambda: 30):
-    """
-    Provides an easy way to print out a header.
-    :param string: The header as a string.
-    :param key: Length of the message.
-    """
-    print("\n")
-    print((len(string) % 2)*'-' + '{:-^{width}}'.format(string, width=key()))
+def plot_output(data: dict):
+    pass
+
+
+def save_output(data: dict):
+    pass
 
 
 if __name__ == "__main__":
-    py_dir = os.path.dirname(__file__)
-    # os.chdir(py_dir)
-    os.chdir("./helpers")
-    temp = take_all_inputs()
-    data = temp[0]
-    ceagui_name = temp[1]
-    cea_main(data, ceagui_name)
-    nozzle_main(data)
-    injector_main(data)
-    for key in data:
-        print(f"{key} = {data[key]}")
+    start = time.perf_counter()
+    data = main()
+    if data["plot_on"]:
+        plot_output(data)
+    if data["save_data_on"]:
+        save_output(data)
+    duration = round(time.perf_counter()-start, 4)
+    print_header(f"DesignLiquidEngine completed exectution in {duration} seconds.")

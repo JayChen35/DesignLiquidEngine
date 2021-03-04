@@ -1,19 +1,11 @@
-# Caelus Engine Parameterization Script
-# Authors: Tanmay Neema, Daniel DeConti, Jessica Chen, Liam West
-# Original code & methods sourced from Jason Chen
+# Python interface to CEA (Chemical Equilibrium with Applications)
+# Authors: Tanmay Neema, Jason Chen, Daniel DeConti, Jessica Chen, Liam West
+# Original interface code written by Jason Chen
 # Project Caelus, 04 February 2021
 
 
-
-"""
-INPUTS:
-    CEAgui
-        - O/F = 
-OUTPUTS:
-    
-"""
-
 import os
+import shutil
 import sys
 import csv
 import math
@@ -22,64 +14,26 @@ import time
 import subprocess
 import threading
 import pyautogui
-
-# Preprocessing
-
-# Input non-CEAgui vars from text file
-def input_variables():
-    print("Input variables using a .txt file. Enter floats only. Ensure file is within folder of .py file.")
-    print("Please list them in the order they are listed at the top of the file, i.e. \n Thrust=___ \n Chamber Pressure=___ \n . \n . \n .")
-    
-    file_ext = input("Enter file path with .txt: ")
-    file_name = file_ext.split(".")[0]
-    data = dict()
-    try:
-        with open(file_ext) as f:
-            for line in f:
-                equal_index = line.find("=")
-                name = line[:equal_index].strip()
-                value = float(line[equal_index+1:].strip())
-                data[name] = value
-    except IOError:
-        print("Please ensure input.txt is named correctly and in the correct directory.")
-    except ValueError:
-        print("Please ensure inputs are entered as floats with no other text in the file")
-    data["P3"] = get_exit_pressure(data["altitude"])
-    ceagui_name = file_name + "_ceagui"
-    return data, ceagui_name
+from helpers.misc import print_header
 
 
-def get_exit_pressure(h: int or float):
-    """
-    Sourced from NASA Glenn Research Center's Earth Atmosphere Model.
-    Computes and sets the ambient pressure, P3, based on inputted altitude (meters).
-    P3 has units in pascals. Note: The intermediate temperature calculations use Celsius.
-    :param h: Altitude, in meters.
-    :return P3: Ambient pressure at altitude, in pascals.
-    """
-    if (h >= 25000):  # Upper Stratosphere
-        T = -131.21 + 0.00299 * h
-        P3 = (2.488 * ((T + 273.1) / 216.6) ** (-11.388))*1000
-    elif (11000 < h < 25000):  # Lower Stratosphere
-        T = -56.46
-        P3 = (22.65 * math.exp(1.73 - 0.000157 * h))*1000
-    else: # Troposphere
-        T = 15.04 - 0.00649 * h
-        P3 = (101.29 * ((T + 273.1) / 288.08) ** (5.256))*1000
-    return P3
+def cea_inp(data: dict, case_name: str) -> str:
+    """ Creates CEA .inp input file given a case_name. Returns path to case directory."""
+    case_dir = f"./case-files/{case_name}"
+    pressure_ratio = round(data["P0"]/data["P3"], 3)
+    # Frozen tends to overestimate engine performance, equilibrium tends to underestimate
+    frozen = "frozen nfz=1" if bool(data["frozen"]) else "equilibrium" # Freezing point at throat
+    # Make case folder and input file
+    if os.path.exists(case_dir) and os.path.isdir(case_dir): # Clear existing folder if it exists
+        shutil.rmtree(case_dir)
+    os.makedirs(case_dir)
 
-
-def ceagui_inp(data, ceagui_name):
-    cea_exe_dir = "./CEAexec/cea-exec/"
-    pressure_ratio = round(data["P0"] / data["P3"], 3)
-    frozen = "frozen nfz=1" if bool(data["frozen"]) else "equilibrium"
-    # Make the file
-    with open(cea_exe_dir + ceagui_name + ".inp", "w+") as f:
-        line_1 = f"problem  case={ceagui_name} o/f={data['o/f']},\n"
+    with open(f"{case_dir}/{case_name}.inp", "w+") as f:
+        line_1 = f"problem  case={case_name} o/f={data['of_ratio']},\n"
         f.write(line_1)
         line_2 = f"      rocket  {frozen}\n"
         f.write(line_2)
-        line_3 = f"  p,bar={data['P0']/100000},\n"
+        line_3 = f"  p,bar={data['P0']/1e05},\n" # Pascal to Bar conversion
         f.write(line_3)
         line_4 = f"  pi/p={pressure_ratio},\n"
         f.write(line_4)
@@ -94,90 +48,88 @@ def ceagui_inp(data, ceagui_name):
         line_9 = "end"
         f.write(line_9)
         f.close()
-        print(f"Operation complete. {ceagui_name}.inp saved to {cea_exe_dir}")
-        
+    print(f"CEA input generation complete. {case_name}.inp saved to {case_dir}.")
+    return case_dir
 
 
+def driver_cea(case_name: str, case_dir: str):
+    """ Driver for running the CEA executable. """
+    cea_exe_dir = "./CEAexec/cea-exec/"
+    # Move .inp file to same directory as FCEA2m.exe
+    os.rename(f"{case_dir}/{case_name}.inp", f"./CEAexec/cea-exec/{case_name}.inp")
+    t1 = threading.Thread(target=type_with_delay, args=(case_name, 0.25), daemon=True)
+    t1.start()
+    subprocess.call([cea_exe_dir + "FCEA2m.exe"], cwd=cea_exe_dir)
+    t1.join()
+    # Move .inp and .out file to original directory
+    os.rename(f"./CEAexec/cea-exec/{case_name}.inp", f"{case_dir}/{case_name}.inp")
+    os.rename(f"./CEAexec/cea-exec/{case_name}.out", f"{case_dir}/{case_name}.out")
+    print(f"CEA execution complete. {case_name}.out saved to {case_dir}.")
+
+    
 def type_with_delay(dir_name: str, delay: int or float):
-    print(f"EXECUTING {dir_name}")
     time.sleep(delay)
     pyautogui.typewrite(dir_name)
     pyautogui.press("enter")
-
-
-def driver_cea(ceagui_name):
-    cea_exe_dir = "./CEAexec/cea-exec/"
-    t1 = threading.Thread(target=type_with_delay, args=(ceagui_name, 0.25), daemon=True)
-    t1.start()
-    subprocess.call([cea_exe_dir + "FCEA2m.exe"],  cwd = cea_exe_dir)
-    t1.join()
-    print(f"Operation complete. {ceagui_name}.out saved to {cea_exe_dir}")
    
 
-
-def cea_outparse(ceagui_name, data):
+def cea_outparse(data: dict, case_name: str, case_dir: str) -> dict:
+    """ Parses the CEA .out output file to collect thermodynamics data. """
     cea_exe_dir = "./CEAexec/cea-exec/"
-    csv_filename = f"{ceagui_name}.csv"
-    cea_filename = f"{ceagui_name}.out"
+    csv_filename = f"{case_dir}/{case_name}.csv"
+    cea_filename = f"{case_dir}/{case_name}.out"
     delimiter = "THEORETICAL ROCKET PERFORMANCE"
-    with open(cea_exe_dir + csv_filename, mode="w", newline="") as csv_f:
-        with open(cea_exe_dir + cea_filename, mode="r") as cea_f:
+    with open(csv_filename, mode="w", newline="") as csv_f:
+        with open(cea_filename, mode="r") as cea_f:
             cea_lines = cea_f.readlines()
             file_writer = csv.writer(csv_f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            unique_rows = set()
             row = ["O/F", "P0 (BAR)", "P1 (BAR)", "T0 (K)", "M (1/n)", "GAMMA", "CSTAR (M/SEC)", "ISP (M/SEC)"]
-            file_writer.writerow(row)
-            vals = []
-            for line in cea_lines:
-                if delimiter in line:
-                    vals = []
+            dims = len(row)
+            for i, line in enumerate(cea_lines): 
+                if delimiter in line: # Clear the row and append to a new one
+                    assert len(row) == dims # Forces the number of columns to match (a valid table)
+                    if str(row) not in unique_rows: # Allows intake of multiple chamber pressures & O/F ratios
+                        unique_rows.add(str(row))
+                        file_writer.writerow(row)
+                    row = []
+                    continue
+                line = line.strip()
                 if "O/F=" in line:
                     temp = line.split()
-                    vals.append(temp[1])
+                    row.append(temp[1])
                 if "P, BAR" in line:
                     temp = line.split()
-                    vals.append(temp[2])
-                    vals.append(temp[3])
+                    row.append(temp[2])
+                    row.append(temp[3])
+                    data["P1"] = float(temp[3])*1e05 # Nozzle (critical) pressure [Pa]
                 if "T, K" in line:
                     temp = line.split()
-                    vals.append(temp[2])
+                    row.append(temp[2])
+                    data["T0"] = float(temp[2]) # Combustion chamber temperature [K]
                 if "M, (1/n)" in line:
                     temp = line.split()
-                    vals.append(temp[2])
+                    row.append(temp[2])
+                    data["M"] = float(temp[2]) # Molecular mass [kg/mol]
                 if "GAMMAs" in line:
                     temp = line.split()
-                    vals.append(temp[1])
+                    row.append(temp[1])
+                    data["gamma"] = float(temp[1]) # Ratio of specific heats [~]
                 if "CSTAR, M/SEC" in line:
                     temp = line.split()
-                    vals.append(temp[2])
+                    row.append(temp[2])
+                    data["cstar_max"] = float(temp[2]) # Maximum (theoretical) C* [m/s]
                 if "Isp, M/SEC" in line:
                     temp = line.split()
-                    vals.append(temp[2])
-        file_writer.writerow(vals)
-        i = 3
-        while i < 8:
-            data[row[i].split()[0]] = float(vals[i]) 
-            i += 1
-    print("Operation complete. CSV file saved to {}".format(csv_filename))
+                    row.append(temp[2])
+                    data["isp_max"] = float(temp[2]) # Maximum (theoretical) specific impulse [m/s]
+            file_writer.writerow(row)
+    print(f"CEA output parsing complete. {case_name}.csv saved to {case_dir}.")
+    return data
 
 
-def print_outputs(data):
-    for key in data:
-        print(f"{key} = {round(data[key], 3)}")
-
-
-
-def cea_main(data, ceagui_name):
-    ceagui_inp(data, ceagui_name)
-    driver_cea(ceagui_name)
-    cea_outparse(ceagui_name, data)
-
-if __name__ == "__main__":
-    py_dir = os.path.dirname(__file__)
-    os.chdir(py_dir)
-    temp = input_variables()
-    data = temp[0]
-    ceagui_name = temp[1]
-    ceagui_inp(data, ceagui_name)
-    driver_cea(ceagui_name)
-    cea_outparse(ceagui_name, data)
-    print_outputs(data)
+def cea_main(data: dict, case_name: str):
+    case_dir = cea_inp(data, case_name)
+    driver_cea(case_name, case_dir)
+    data = cea_outparse(data, case_name, case_dir)
+    return data

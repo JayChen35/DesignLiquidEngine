@@ -3,9 +3,16 @@
 ###### Requirements without version specifiers ######
 pyyaml
 json
+csv
+threading
+pyautogui
+time
+datetime
+shutil
 
 ###### Requirements with version specifiers ######
 numpy >= 1.20.1
+matplotlib >= 3.3.4
 
 ###### Exmaples ######
 # See https://www.python.org/dev/peps/pep-0440/#version-specifiers
