@@ -1,7 +1,0 @@
- C2H5OH(L) 
- H2O(L) 
- N2O 
- ENDR
-   
-    
-    
