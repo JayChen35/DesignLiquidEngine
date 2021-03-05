@@ -11,19 +11,34 @@ import yaml
 import sys
 import time
 import datetime
+from typing import Tuple
 from helpers.misc import get_exit_pressure, print_header
 from helpers.cea import cea_main
 from helpers.nozzle import nozzle_main
 from helpers.injector import injector_main
 
 
-def main() -> dict:
+def main(cmd_args: tuple) -> Tuple[dict, float]:
     # Ingest user parameters and store into data{} dictionary.
+    contains_cmd_args = len(cmd_args) > 1
+    if len(cmd_args) == 2 and (cmd_args[1] == "--default" or cmd_args[1] == "-d"):
+        temp_path, temp_name = "", ""
+    elif len(cmd_args) == 3 and (cmd_args[1] == "-c" or cmd_args[1] == "-n"):
+        temp_path = "" if cmd_args[1] == "-n" else cmd_args[2] # Inputting a name = default config
+        temp_name = "" if cmd_args[1] == "-c" else cmd_args[2] # Inputting a config = default name
+    elif len(cmd_args) == 5 and (cmd_args[1] == "-c") and (cmd_args[3] == "-n"):
+        temp_path, temp_name = cmd_args[2], cmd_args[4]
+    elif len(cmd_args) == 5 and (cmd_args[1] == "-n") and (cmd_args[3] == "-c"):
+        temp_path, temp_name = cmd_args[4], cmd_args[2]
+    else:
+        print_header("Invalid command line arguments. Please see README.md for correct formatting.")
+        sys.exit(0)
     terminal = False
     while not terminal:
-        print("Enter configuration (parameter) file path, including .yaml extension (e.g. \"config.yaml\").")
-        print("Alternatively, press [ENTER] to use default file (./config.yaml), or [0] to exit.")
-        temp_path = input("File path: ")
+        if not contains_cmd_args:
+            print("Enter configuration (parameter) file path, including .yaml extension (e.g. \"config.yaml\").")
+            print("Alternatively, press [ENTER] to use default file (./config.yaml), or [0] to exit.")
+            temp_path = input("Please enter a file path or command: ")
         try:
             if temp_path == "":
                 temp_path = "./config.yaml"
@@ -35,17 +50,20 @@ def main() -> dict:
                 terminal = True
         except IOError or ValueError or AssertionError:
             print_header("Invalid file path. Please ensure the file path is typed correctly.")
+            if contains_cmd_args: sys.exit(0)
     input_path = temp_path
     # Get ambient pressure given the input altitude
     data["P3"] = get_exit_pressure(data["altitude"])
     # Get desired name of output/case files from user
-    temp_name = input("Enter the desired name of output/case files (press [ENTER] to use default): ")
+    if not contains_cmd_args:
+        temp_name = input("Enter the desired name of output/case files (press [ENTER] to use default): ")
     if temp_name == "":
         case_name = datetime.datetime.now().strftime("%d-%b-%Y_%H%M%S") + "EST"
-    else:
+    else: # Make the inputted case name a valid case name
         case_name = "".join([x if(x.isalnum() or x in "._- ") else "_" for x in temp_name])
     # Change current working directory to ./helpers
     os.chdir("./helpers")
+    start_time = time.perf_counter() # Start runtime timer after inputs are recieved
     # Run Chemical Equilibrium with Applications (CEA) interface code
     data = cea_main(data, case_name)
     # Run nozzle design code (assuming quasi-1D isentropic flow)
@@ -55,7 +73,7 @@ def main() -> dict:
     # Print calculation outputs
     for key, val in data.items():
         print(f"{key} = {val}")
-    return data
+    return data, start_time
 
 
 def plot_output(data: dict):
@@ -67,11 +85,11 @@ def save_output(data: dict):
 
 
 if __name__ == "__main__":
-    start = time.perf_counter()
-    data = main()
+    cmd_args = sys.argv # Accepts command line arguements
+    data, start_time = main(cmd_args)
     if data["plot_on"]:
         plot_output(data)
     if data["save_data_on"]:
         save_output(data)
-    duration = round(time.perf_counter()-start, 4)
+    duration = round(time.perf_counter()-start_time, 4)
     print_header(f"DesignLiquidEngine completed exectution in {duration} seconds.")

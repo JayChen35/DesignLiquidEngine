@@ -42,8 +42,8 @@ inputs.ox.injector_area = 2.571e-05; % m^2
 inputs.fuel.injector_area = 6.545e-06; % 4.571e-06 m^2
 
 % Fuel line valve Cv values (flow coefficients), assumed in series
-inputs.fuel.valve_cvs = [0.9]; % Leave array empty/zero if no propellant valves
-inputs.ox.valve_cvs = [0.9];
+inputs.fuel.valve_cvs = [0.9 0.7]; % Leave array empty/zero if no propellant valves
+inputs.ox.valve_cvs = [0.9 0.7];
 
 % Ball Valve Time to Injector Area (s)
 inputs.dt_valve_open = 0.01;

@@ -480,7 +480,7 @@ end
 %           - So, 7.59805e-07*Cv/sqrt(2/rho_H2O) = CdA [m^2]
 %       - Combine valve's CdA with injector CdA to find effective CdA 
 
-injector_area = inputs.fuel.Cd_injector*inputs.fuel.injector_area*inputs.Throttle(time);
+injector_area = inputs.fuel.Cd_injector*A_inj;
 Cv_eff = TotalCv(inputs.fuel.valve_cvs); % Effective total Cv of all valves
 if Cv_eff == 0 % User input indicated no propellant valves; simply use A_inj
     CdA_eff = injector_area;

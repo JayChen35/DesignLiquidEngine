@@ -75,7 +75,7 @@ from helpers.misc import print_header
 
 
 def nozzle_main(data: dict) -> dict:
-    """ Attempts to calculate and print values. """
+    """ Calculates nozzle parameters. """
 
     F = data["thrust"]
     P0 = data["P0"]
@@ -87,45 +87,53 @@ def nozzle_main(data: dict) -> dict:
     k = data["gamma"]
     Lstar = data['Lstar']
 
-    R = (8314.3 / M)
-    PR = (P3 / P0)
-    AR = (((k + 1) / 2) ** (1 / (k - 1))) * ((P3 / P0) ** (1 / k)) * (
-        np.sqrt(((k + 1) / (k - 1)) * (1 - ((P3 / P0) ** ((k - 1) / k)))))
+    R = (8314.4621/M)
+    PR = (P3/P0)
+    AR = (((k+1)/2) ** (1/(k-1))) * ((P3/P0) ** (1/k)) * (
+        np.sqrt(((k+1) / (k-1)) * (1 - ((P3/P0) ** ((k-1)/k)))))
     ER = 1 / AR
     Tt = (2 * T0) / (k + 1)
-    v2 = np.sqrt((2 * k / (k - 1)) * ((R) * T0) * (1 - ((P3 / P0) ** ((k - 1) / k))))
+    v2 = np.sqrt((2*k / (k-1)) * ((R) * T0) * (1 - ((P3/P0) ** ((k-1)/k))))
     mdot = F / v2
-    mdot_fuel = (mdot / (OF + 1))
-    mdot_oxidizer = (mdot / (OF + 1)) * OF
-    Isp = F / (mdot * 9.80655)
-    Te = T0 / ((P0 / P3) ** ((k - 1) / k))
+    mdot_fuel = (mdot / (OF+1))
+    mdot_oxidizer = (mdot / (OF+1)) * OF
+    Isp = F / (mdot*9.80655)
+    Te = T0 / ((P0/P3) ** ((k-1)/k))
     Mnum = (v2 / (np.sqrt(k * (R) * (Te))))
-    At = ((mdot) * (np.sqrt((k * R * T0)))) / (k * P0 * (np.sqrt(((2 / (k + 1)) ** ((k + 1) / (k - 1))))))
+    At = ((mdot) * (np.sqrt((k*R*T0)))) / (k * P0 * (np.sqrt(((2/(k+1)) ** ((k+1)/(k-1))))))
     Ae = ER * At
-    Rt = np.sqrt(At / np.pi)
-    Re = np.sqrt(Ae / np.pi)
+    Rt = np.sqrt(At/np.pi)
+    Re = np.sqrt(Ae/np.pi)
     Ac = At * 8
     Rc = np.sqrt((Ac) / np.pi)
-    Lc = ((At) * Lstar) / (Ac)
-    Ldn = ((Re) - (Rt)) / (np.tan(np.deg2rad(15)))
-    Lcn = ((Rc) - (Rt)) / (np.tan(np.deg2rad(45)))
+    Lc = ((At)*Lstar) / (Ac)
+    Ldn = ((Re)-(Rt)) / (np.tan(np.deg2rad(15)))
+    Lcn = ((Rc)-(Rt)) / (np.tan(np.deg2rad(45)))
+    
+    data["v2"] = v2 # [m/s] Effective exhaust velocity 
+    data["x_mdot"] = mdot # [kg/s] Target total mass flow rate
+    data["x_mdot_f"] = mdot_fuel # [kg/s] Target fuel mass flow rate
+    data["x_mdot_ox"] = mdot_oxidizer # [kg/s] Target oxidizer mass flow rate
+    data["isp_max"] = Isp # [s] Maximum (theoretical) specific impulse
+    
+    data["nozzle"] = dict()
+    data["nozzle"]["ER"] = ER # [~] Expansion ratio 
+    data["nozzle"]["Tt"] = Tt # [K] Temperature at nozzle throat 
+    data["nozzle"]["Te"] = Te # [K] Temperature at the nozzle exit
+    data["nozzle"]["Mnum"] = Mnum # [~] Exit Mach number
+    data["nozzle"]["At"] = At
+    data["nozzle"]["Rt"] = Rt
+    data["nozzle"]["Ae"] = Ae
+    data["nozzle"]["Re"] = Re
+    data["nozzle"]["Ac"] = Ac
+    data["nozzle"]["Rc"] = Rc
+    data["nozzle"]["Lc"] = Lc
+    data["nozzle"]["Ldn"] = Ldn
+    data["nozzle"]["Lcn"] = Lcn
 
-    data["ER"] = ER # Expansion ratio [~]
-    data["Tt"] = Tt # Temperature at nozzle throat [K]
-    data["v2"] = v2 # Effective exhaust velocity [m/s]
-    data["mdot"] = mdot
-    data["mdot_fuel"] = mdot_fuel # TODO: Make this a nested dictionary
-    data["mdot_oxidizer"] = mdot_oxidizer
-    data["Isp"] = Isp # TODO: This shouldn't be here
-    data["Te"] = Te
-    data["Mnum"] = Mnum
-    data["At"] = At
-    data["Ae"] = Ae
-    data["Rt"] = Rt
-    data["Re"] = Re
-    data["Ac"] = Ac
-    data["Rc"] = Rc
-    data["Lc"] = Lc
-    data["Ldn"] = Ldn
-    data["Lcn"] = Lcn
+    data["d_throat"] = Rt*2
+    data["d_cc"] = Rc*2
+    data["length_cc"] = Lc
+    data["exp_ratio"] = ER
+
     return data

@@ -1,27 +1,85 @@
 ---
-#--------User Design Parameters--------
+#---------User Design Parameters---------
 # Modify these following values to match your engine design parameters.
-# Note that [~] indicates dimensionless parameters.
+# NOTE: [~] indicates dimensionless parameters. Units default to SI units.
+# NOTE: `null` indicates that the value is calculated, but can also be set.
+# The user should leave as `null` if he/she is unsure about the parameter.
 thrust : 3000 # [N] Thrust
 of_ratio : 4 # [~] Oxidizer-to-fuel ratio
 P0 : 3000000 # [Pa] Chamber pressure
 altitude : 500 # [m] Operational altitude
 frozen : true # [~] Frozen/equilibrium combusion
-temp : 298 # [K] Ambient temperature 
+temp : 300 # [K] Ambient temperature 
 Lstar : 1.25 # [m] Mixing length
-rho_o : 772.75 # [kg/m^3] Density of oxidizer
-rho_f : 789 # [kg/m^3] Density of fuel
-delta_p : 25.0 # [~] % of injector/chamber dP
-d_o : 1.58 # [mm] Diameter of oxidizer orifices
-d_f : 1.00 # [mm] Diameter of fuel orifices
-Cd_o : 0.9 # [~] Discharge coefficent of ox
-Cd_f : 0.88 # [~] Discharge coefficent of fuel
-#------Runtime & Script Parameters------
+t_b : 3 # [s] Burn time
+
+#------Runtime & Script Parameters-------
 plot_on : true
 save_data_on : true
+
+#-------Plumbing System Properties-------
+ox: # Oxidizer (nitrous oxide) properties
+  injector_area : null # [m^2] Total injector orifice area
+  # [~] Array of valve flow coefficients (Cv), assumed to be in series
+  valve_cvs: # Leave array empty/as zero if no propellant valves
+    - 0.9
+    - 1.0
+  Cd_injector : 0.9 # [~] Dischrge coefficient (of injector orifices)
+  V_tank : 8 # [L] Propellant tank volume (around 60 cubic feet)
+  V_l : null # [L] Liquid nitrous volume (null = caclulated via mdot*t_b)
+  tank_id : 5 # [in] Tank inner diameter
+  h_offset_tank : 2 # [m] Distance from bottom of tank to injector
+  d_flowline : 0.5 # [in] Main flow line diameter
+  T_tank : 300 # [K] Tank temperature
+ox_pressurant: # Properties for the gaseous oxidizer pressurant (nitrous)
+  active: false # Supercharging; pressurizing ox above vapor pressure?
+
+fuel: # Fuel (95% ethyl alcohol) properties
+  injector_area : null # [m^2] Total injector orifice area
+  valve_cvs: # Leave array empty/as zero if no propellant valves
+    - 0.9
+    - 1.0
+  Cd_injector : 0.88 # [~] Dischrge coefficient (of injector orifices)
+  V_tank : 4 # [L] Propellant tank volume (around 30 cubic feet)
+  V_l : null # [L] Liquid ethanol volume (null = caclulated via mdot*t_b)
+  tank_id : 5 # [in] Tank inner diameter
+  h_offset_tank : 2 # [m] Distance from bottom of tank to injector
+  d_flowline : 0.5 # [in] Main flow line diameter
+  T_tank : 300 # [K] Tank temperature
+fuel_pressurant: # Properties for the gaseous fuel pressurant (nitrogen)
+  active: false # Supercharging; pressurizing ox above vapor pressure?
+
+#---------Additional Properties----------
+dt_valve_open : 0.01
+mass_dry_rocket : 30 # [lbm] Dry mass of the rocket
+# Combustion chamber dimensions
+length_cc : null # [m]
+d_cc : null # [m]
+# Estimated nozzle efficiency
+nozzle_efficiency : 0.95 # [~]
+nozzle_correction_factor : 0.9830 # [~]
+c_star_efficiency : 0.85 # [~] Estimated combustion efficiency
+d_throat : null # [m] Nozzle throat diameter
+# Fluid properties
+rho_o : 772.75 # [kg/m^3] Density of oxidizer
+rho_f : 789 # [kg/m^3] Density of fuel
+# Injector parameters
+delta_p : 25.0 # [~] % of injector/chamber dP
+min_d_o : 1.58 # [mm] Diameter of oxidizer orifices
+min_d_f : 1.00 # [mm] Diameter of fuel orifices
+
+#-------PropSim Runtime Parameters-------
+mode:
+  combustion_on : true
+  flight_on : false
+options:
+  t_final : 60
+  dt : 0.01
+  output_on : null # Corresponds with (is equal to) `plot_on`
+
 #-----Standard Parameters/Constants-----
 # These values are either well-established standards or numerical constants.
-# Do not modify these values unless you know know what you are doing. 
+# Do not modify these values unless you are aware of their consequences.
 imp_angle : 60 # [deg] Orifice impingement angle
 M_coeff : 1.6 # [~] 2-on-1 doublet M coefficient
 jet_LD : 6 # [~] Jet length/diameter ratio
