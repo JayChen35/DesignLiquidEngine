@@ -18,7 +18,7 @@ from helpers.nozzle import nozzle_main
 from helpers.injector import injector_main
 
 
-def main(cmd_args: tuple) -> Tuple[dict, float]:
+def main(cmd_args: list) -> Tuple[dict, float]:
     # Ingest user parameters and store into data{} dictionary.
     contains_cmd_args = len(cmd_args) > 1
     if len(cmd_args) == 2 and (cmd_args[1] == "--default" or cmd_args[1] == "-d"):
@@ -30,6 +30,8 @@ def main(cmd_args: tuple) -> Tuple[dict, float]:
         temp_path, temp_name = cmd_args[2], cmd_args[4]
     elif len(cmd_args) == 5 and (cmd_args[1] == "-n") and (cmd_args[3] == "-c"):
         temp_path, temp_name = cmd_args[4], cmd_args[2]
+    elif not contains_cmd_args:
+        pass
     else:
         print_header("Invalid command line arguments. Please see README.md for correct formatting.")
         sys.exit(0)
