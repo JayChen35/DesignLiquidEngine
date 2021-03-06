@@ -4,13 +4,7 @@
 % Driver for running PerformaceCode.m
 
 %% Preprocessing
-function [] = PropSimIntegrated(jsonPath)
-    addpath(fullfile(pwd, 'Supporting Functions'))
-    val = jsondecode(fileread(jsonPath));
-    % clc;
-    % clear;
-    % close all;
-
+function [] = PropSimIntegrated()
     %% Unit Conversion
     psi_to_Pa = 6894.75729; % 1 psi in Pa
     in_to_m = 0.0254; % 1 in in m
@@ -25,9 +19,6 @@ function [] = PropSimIntegrated(jsonPath)
     mode.combustion_on = 1;
     % 1: simulate flight conditions (i.e. acceleration head), 0: ground test
     mode.flight_on = 0;
-
-    %% Input Parameters
-    inputs.CombustionData = fullfile('Combustion Data', 'CombustionData_T1_N2O.mat');
 
     %-------Gases-----------------------
     helium = Gas();
@@ -93,7 +84,7 @@ function [] = PropSimIntegrated(jsonPath)
     inputs.fuel.V_tank = 11.564*L_to_m3; 
 
     % Fuel Volume
-    inputs.fuel.V_l = 1.267*L_to_m3; % 0.881
+    inputs.fuel.V_l = 4*L_to_m3; % 0.881
 
     % Tank Inner Diameter
     inputs.fuel.tank_id = 5*in_to_m;
@@ -142,7 +133,7 @@ function [] = PropSimIntegrated(jsonPath)
     inputs.p_amb = 9.554e04; % Pa
 
     % Load Combustion Data
-    inputs.comb_data = load(inputs.CombustionData); 
+    inputs.comb_data = load('CombustionData_T1_N2O.mat'); 
     inputs.comb_data = inputs.comb_data.CombData;
 
     %-------Other Options--------

@@ -189,7 +189,7 @@ narginchk(2,3);
 % Error if third input exists and is not an acceptable string
 if nargin == 3
     if ~ischar(varargin{2}) && ~isstring(varargin{2})
-        error(message('aero:flownormalshock:paramSelectString'));
+        fprintf(('aero:flownormalshock:paramSelectString'));
     end
 end
 
@@ -197,40 +197,40 @@ end
 
 % Error if specific heat ratio input is not numeric
 if ~isnumeric(gamma)
-    error(message('aero:flownormalshock:notNumericGamma'));
+    fprintf(('aero:flownormalshock:notNumericGamma'));
 end
 
 % gamma > 1 check (specific heat ratio must be greater than 1)
 if any(gamma<=1)
-    error(message('aero:flownormalshock:gammaOneOrLess'));
+    fprintf(('aero:flownormalshock:gammaOneOrLess'));
 end
 
 % gamma real number check
 if ~isreal(gamma)
-    error(message('aero:flownormalshock:imaginaryGamma'));
+    fprintf(('aero:flownormalshock:imaginaryGamma'));
 end
 
 % Error if gamma input is a matrix or if second input variable is a matrix
 if (~isvector(gamma) || ~isvector(varargin{1}))
-    error(message('aero:flownormalshock:multiDimensional'))
+    fprintf(('aero:flownormalshock:multiDimensional'))
 end
 
 % Second input general checks (varargin{1})
 
 % Error if second input variable is not numeric
 if ~isnumeric(varargin{1})
-    error(message('aero:flownormalshock:notNumeric'));
+    fprintf(('aero:flownormalshock:notNumeric'));
 end
 
 % Error if inputs are not the same size and if neither are scalars
 if ~((isscalar(gamma) || isscalar(varargin{1})) || ...
         (isequal(size(gamma),size(varargin{1}))))
-    error(message('aero:flownormalshock:size'))
+    fprintf(('aero:flownormalshock:size'))
 end
 
 % Second input variable real number check
 if ~isreal(varargin{1})
-    error(message('aero:flownormalshock:imaginary'));
+    fprintf(('aero:flownormalshock:imaginary'));
 end
 
 % Initialize the string variable as the default (mach)
@@ -274,7 +274,7 @@ if nargin == 3 % If there is a selector string for the second input
     % If the user has a third variable and does not use the third variable
     % as an acceptable string then provide an error message
     else
-        error(message('aero:flownormalshock:paramSelectWrongInput'))
+        fprintf(('aero:flownormalshock:paramSelectWrongInput'))
     end
 end
 
@@ -286,7 +286,7 @@ switch lower(param)
         
         % Error if upstream Mach number input is less than unity
         if any(varargin{1}<1)
-            error(message('aero:flownormalshock:lessThanUnity'));
+            fprintf(('aero:flownormalshock:lessThanUnity'));
         end
         
         % The second input (first variable input) is upstream Mach number
@@ -297,22 +297,22 @@ switch lower(param)
         % Error if temperature ratio or specific heat ratio inputs are not
         % scalars for temperature ratio input mode
         if ~(isscalar(gamma) && isscalar(varargin{1}))
-            error(message('aero:flownormalshock:tempRatioScalar'))
+            fprintf(('aero:flownormalshock:tempRatioScalar'))
         end
         
         % Error if temperature ratio is less than 1
         if varargin{1}<1
-            error(message('aero:flownormalshock:tempRatio'))
+            fprintf(('aero:flownormalshock:tempRatio'))
         end
         
         % Error if specific heat ratio input is not finite (for fzero fcn)
         if ~isfinite(gamma)
-            error(message('aero:flownormalshock:tempRatioGammaFinite'))
+            fprintf(('aero:flownormalshock:tempRatioGammaFinite'))
         end
         
         % Error if temperature ratio input is Not-a-Number (for fzero fcn)
         if isnan(varargin{1})
-            error(message('aero:flownormalshock:tempRatioNan'))
+            fprintf(('aero:flownormalshock:tempRatioNan'))
         end
         
         % The second input (first variable input) is temperature ratio T
@@ -330,7 +330,7 @@ switch lower(param)
         
         % Error if pressure ratio is less than 1
         if any(varargin{1}<1)
-            error(message('aero:flownormalshock:pressureRatio'));
+            fprintf(('aero:flownormalshock:pressureRatio'));
         end
         
         % The second input (first variable input) is pressure ratio P
@@ -358,12 +358,12 @@ switch lower(param)
         
         % Error if density ratio is less than 1
         if any(varargin{1}<1)
-            error(message('aero:flownormalshock:densityRatio', sprintf( '%.17f', obLoDens( 1 ) ), sprintf( '%.15f', obLoGamma( 1 ) )))
+            fprintf(('aero:flownormalshock:densityRatio'))
         end
         
         % Error if density ratio is greater than (GAMMA+1)./(GAMMA-1)
         if any(varargin{1}>((gamma+1)./(gamma-1)))
-            error(message('aero:flownormalshock:densityRatio', sprintf( '%.17f', obHiDens( 1 ) ), sprintf( '%.15f', obHiGamma( 1 ) )))
+            fprintf(('aero:flownormalshock:densityRatio'))
         end
         
         % The second input (first variable input) is density ratio
@@ -391,13 +391,13 @@ switch lower(param)
         
         % Error if downstream Mach number is greater than 1
         if any(varargin{1}>1)
-            error(message('aero:flownormalshock:downstreamMach', sprintf( '%.17f', obHiDown( 1 ) ), sprintf( '%.15f', obHiGamma( 1 ) )))
+            fprintf(('aero:flownormalshock:downstreamMach'))
         end
         
         % Error if downstream Mach number is less than
         % SQRT((GAMMA-1)./(2.*GAMMA))
         if any(varargin{1}<(sqrt((gamma-1)./(2.*gamma))))
-            error(message('aero:flownormalshock:downstreamMach', sprintf( '%.17f', obLoDown( 1 ) ), sprintf( '%.15f', obLoGamma( 1 ) )))
+            fprintf(('aero:flownormalshock:downstreamMach'))
         end
         
         % The second input (first variable input) is downstream Mach number
@@ -417,23 +417,23 @@ switch lower(param)
         % Error if total pressure ratio or specific heat ratio inputs are
         % not scalars for total pressure ratio input mode
         if ~(isscalar(gamma) && isscalar(varargin{1}))
-            error(message('aero:flownormalshock:totalPressureRatioScalar'))
+            fprintf(('aero:flownormalshock:totalPressureRatioScalar'))
         end
         
         % Error if the total pressure ratio is negative
         if varargin{1}<0
-            error(message('aero:flownormalshock:totalPressureRatio'))
+            fprintf(('aero:flownormalshock:totalPressureRatio'))
         end
         
         % Error if the total pressure ratio is greater than 1
         if varargin{1}>1
-            error(message('aero:flownormalshock:totalPressureRatio'))
+            fprintf(('aero:flownormalshock:totalPressureRatio'))
         end
         
         % Error if either input is not finite in total pressure ratio mode
         % (for fzero fcn)
         if ~(isfinite(gamma) && isfinite(varargin{1}))
-            error(message('aero:flownormalshock:totalPressureRatioFinite'))
+            fprintf(('aero:flownormalshock:totalPressureRatioFinite'))
         end
         
         % The second input (first variable input) is total pressure ratio
@@ -452,7 +452,7 @@ switch lower(param)
         % Error if total pressure ratio or specific heat ratio inputs are
         % not scalars for Rayleigh-Pitot ratio input mode
         if ~(isscalar(gamma) && isscalar(varargin{1}))
-            error(message('aero:flownormalshock:pitotRayleighRatioScalar'))
+            fprintf(('aero:flownormalshock:pitotRayleighRatioScalar'))
         end
         
         upperLimit = ((gamma+1)/2)^(-gamma/(gamma-1));
@@ -464,19 +464,19 @@ switch lower(param)
         
         % Error if Rayleigh-Pitot ratio is less than 0
         if varargin{1}<0
-            error(message('aero:flownormalshock:pitotRayleighRatio', sprintf( '%.17f', obLoPitot ), sprintf( '%.15f', obLoGamma )))
+            fprintf(('aero:flownormalshock:pitotRayleighRatio'))
         end
         
         % Error if Rayleigh-Pitot ratio is greater than
         % ((GAMMA+1)./2).^(-GAMMA./(GAMMA-1))
         if varargin{1}>((gamma+1)/2)^(-gamma/(gamma-1))
-            error(message('aero:flownormalshock:pitotRayleighRatio', sprintf( '%.17f', obHiPitot ), sprintf( '%.15f', obHiGamma )))
+            fprintf(('aero:flownormalshock:pitotRayleighRatio'))
         end    
         
         % Error if either input is not finite in Rayleigh-Pitot ratio mode
         % (for fzero fcn)
         if ~(isfinite(gamma) && isfinite(varargin{1}))
-            error(message('aero:flownormalshock:pitotRayleighRatioFinite'))
+            fprintf(('aero:flownormalshock:pitotRayleighRatioFinite'))
         end
         
         % The second input (first variable input) is Rayleigh-Pitot ratio
@@ -537,7 +537,7 @@ switch param
     case 'pitotrayleighratio'
         P1 = varargin{1}.*ones(size(mach));
 end
-
+end
 
 %--------------------------------------------------------------------------
 function mach = invertTempRatio(gamma, T)
@@ -566,6 +566,7 @@ machEval = fzero(@(mach) equation(gamma,T,mach), guessMach);
 
 % Let the Mach number to be used be the same as evaluated Mach number
 mach = machEval;
+end
 
 %--------------------------------------------------------------------------
 function mach = invertTotalPressureRatio(gamma, P0)
@@ -598,6 +599,7 @@ machEval = fzero(@(mach) equation(gamma,P0,mach), guessMach);
 
 % Let the Mach number to be used be the same as evaluated Mach number
 mach = machEval;
+end
 
 %--------------------------------------------------------------------------
 function mach = invertRayleighPitotRatio(gamma, P1)
@@ -630,3 +632,4 @@ machEval = fzero(@(mach) equation(gamma,P1,mach), guessMach);
 
 % Let the Mach number to be used be the same as evaluated Mach number
 mach = machEval;
+end

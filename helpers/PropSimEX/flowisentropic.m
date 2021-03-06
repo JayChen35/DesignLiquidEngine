@@ -162,7 +162,7 @@ narginchk(2,3);
 % Error if third input exists and is not a string
 if nargin == 3
     if ~ischar(varargin{2})
-        error(message('aero:flowisentropic:paramSelectString'))
+        fprintf(('aero:flowisentropic:paramSelectString'))
     end
 end
 
@@ -170,41 +170,41 @@ end
 
 % Error if specific heat ratio input is not numeric
 if ~isnumeric(gamma)
-    error(message('aero:flowisentropic:notNumericGamma'));
+    fprintf(('aero:flowisentropic:notNumericGamma'));
 end
 
 % gamma > 1 check (specific heat ratio must be greater than 1)
 if any(gamma<=1)
-    error(message('aero:flowisentropic:gammaOneOrLess'));
+    fprintf(('aero:flowisentropic:gammaOneOrLess'));
 end
 
 % gamma real number check
 if ~isreal(gamma)
-    error(message('aero:flowisentropic:imaginaryGamma'));
+    fprintf(('aero:flowisentropic:imaginaryGamma'));
 end
 
 % Error if gamma input is a matrix or if second input variable is a matrix
 if (~isvector(gamma) || ~isvector(varargin{1}))
-    error(message('aero:flowisentropic:multiDimensional'))
+    fprintf(('aero:flowisentropic:multiDimensional'))
 end
 
 % Second input general checks (varargin{1})
 
 % Error if second input variable is not numeric
 if ~isnumeric(varargin{1})
-    error(message('aero:flowisentropic:notNumeric'));
+    fprintf(('aero:flowisentropic:notNumeric'));
 end
 
 
 % Error if inputs are not the same size and if neither are scalars
 if ~((isscalar(gamma) || isscalar(varargin{1})) || ...
         (isequal(size(gamma),size(varargin{1}))))
-    error(message('aero:flowisentropic:size'))
+    fprintf(('aero:flowisentropic:size'))
 end
 
 % Second input variable real number check
 if ~isreal(varargin{1})
-    error(message('aero:flowisentropic:imaginary'));
+    fprintf(('aero:flowisentropic:imaginary'));
 end
 
 % Initialize the string variable as the default (mach)
@@ -242,7 +242,7 @@ if nargin == 3 % If there is a selector string for the second input
     % If the user has a third variable and does not use the third variable
     % as an acceptable string then provide an error message
     else
-        error(message('aero:flowisentropic:paramSelectWrongInput'))
+        fprintf(('aero:flowisentropic:paramSelectWrongInput'))
     end
 end
 
@@ -254,7 +254,7 @@ switch lower(param)
         
         % Error if Mach number input is negative
         if any(varargin{1}<0)
-            error(message('aero:flowisentropic:negative'));
+            fprintf(('aero:flowisentropic:negative'));
         end
         
         % The second input (first variable input) is Mach number.
@@ -264,12 +264,12 @@ switch lower(param)
         
         % Error if temperature ratio is less than 0
         if any(varargin{1}<0)
-            error(message('aero:flowisentropic:temperatureRatio'));
+            fprintf(('aero:flowisentropic:temperatureRatio'));
         end
         
         % Error if temperature ratio is greater than 1
         if any(varargin{1}>1)
-            error(message('aero:flowisentropic:temperatureRatio'));
+            fprintf(('aero:flowisentropic:temperatureRatio'));
         end
         
         % The second input (first variable input) is temperature ratio T
@@ -282,12 +282,12 @@ switch lower(param)
         
         % Error if pressure ratio is less than 0
         if any(varargin{1}<0)
-            error(message('aero:flowisentropic:pressureRatio'));
+            fprintf(('aero:flowisentropic:pressureRatio'));
         end
         
         % Error if pressure ratio is greater than 1
         if any(varargin{1}>1)
-            error(message('aero:flowisentropic:pressureRatio'));
+            fprintf(('aero:flowisentropic:pressureRatio'));
         end
         
         % The second input (first variable input) is pressure ratio P
@@ -300,12 +300,12 @@ switch lower(param)
         
         % Error if density ratio is less than 0
         if any(varargin{1}<0)
-            error(message('aero:flowisentropic:densityRatio'));
+            fprintf(('aero:flowisentropic:densityRatio'));
         end
         
         % Error if density ratio is greater than 1
         if any(varargin{1}>1)
-            error(message('aero:flowisentropic:densityRatio'));
+            fprintf(('aero:flowisentropic:densityRatio'));
         end
         
         % The second input (first variable input) is density ratio RHO
@@ -476,20 +476,20 @@ function areaRatioSpecificErrors(gamma, A)
 % Error if area ratio or specific heat ratio inputs are not scalars for
 % area ratio input mode
 if ~(isscalar(gamma) && isscalar(A))
-    error(message('aero:flowisentropic:areaRatioScalar'))
+    fprintf(('aero:flowisentropic:areaRatioScalar'))
 end
 
 % Error if area ratio is less than 1
 if any(A<1)
-    error(message('aero:flowisentropic:areaRatio'))
+    fprintf(('aero:flowisentropic:areaRatio'))
 end
 
 % Error if area ratio is Not-a-Number
 if isnan(A)
-    error(message('aero:flowisentropic:nan'))
+    fprintf(('aero:flowisentropic:nan'))
 end
 
 % Error if specific heat ratio is not a finite value
 if ~isfinite(gamma)
-    error(message('aero:flowisentropic:areaRatioGamma'))
+    fprintf(('aero:flowisentropic:areaRatioGamma'))
 end

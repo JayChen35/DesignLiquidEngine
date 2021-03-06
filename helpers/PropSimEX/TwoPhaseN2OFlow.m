@@ -107,43 +107,6 @@ G_out(P_2 > P_2_crit_exp) = G(P_2 > P_2_crit_exp);
 G_inc = sqrt(2*(P_1-P_2)*n2o_prop_1_sat.rho_l);
 
 
-% Plotting
-n_plots = 3;
-if plots_on
-    for plot_index = round(linspace(1,size(P_2,2),n_plots))
-        P_1_norm_index = P_1_norm(:,plot_index);
-        P_1_norm_index = P_1_norm_index(~isnan(P_1_norm_index));
-        P_1_norm_index = mean(P_1_norm_index);
-
-        figure
-        subplot(2,2,1)
-        plot(P_2_norm(:,plot_index), G(:,plot_index),...
-            P_2_norm(:,plot_index), G_out(:,plot_index),  ...
-            P_2_norm(:,plot_index), G_inc(:,plot_index))
-        xlabel('Normalized Back Pressure (p_{downstream}/p_{upstream})')
-        ylabel('Ox Mass Flux [kg/m^2*s]')
-        xlim([min(P_2_norm(:,plot_index)),max(P_2_norm(:,plot_index))])
-        legend({'HEM - Calc.','HEM - Physical','Incompressible'})
-        subplot(2,2,2)
-        plot(P_2_norm(:,plot_index), G_out(:,plot_index))
-        xlabel('Normalized Back Pressure (p_{downstream}/p_{upstream})')
-        ylabel('Ox Mass Flux [kg/m^2*s]')
-        xlim([min(P_2_norm(:,plot_index)),max(P_2_norm(:,plot_index))])
-        subplot(2,2,3)
-        plot(P_2_norm(:,plot_index), massfrac(:,plot_index))
-        xlabel('Normalized Back Pressure (p_{downstream}/p_{upstream})')
-        ylabel('Vapor Mass Fraction')
-        subplot(2,2,4)
-        plot(P_2_norm(:,plot_index), rho_2_equiv(:,plot_index), ...
-            P_2_norm(:,plot_index), rho_2_g(:,plot_index), ...
-            P_2_norm(:,plot_index), rho_2_l(:,plot_index))
-        xlabel('Normalized Back Pressure (p_{downstream}/p_{upstream})')
-        ylabel('Density [kg/m^3]')
-        legend({'Effective','Gas','Liquid'})
-        suptitle(sprintf('p_{upstream}/p_{vapor} = %.3g', P_1_norm_index))
-    end
-end
-
 % Package for output
 crit_flow.p_up_norm = p_1;
 crit_flow.G_crit = G_crit;
