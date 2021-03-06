@@ -2,17 +2,12 @@
 
 ###### Requirements without version specifiers ######
 pyyaml
-json
-csv
-threading
 pyautogui
-time
 datetime
-shutil
 typing
 
 ###### Requirements with version specifiers ######
-numpy >= 1.20.1
+numpy >= 1.18.5
 matplotlib >= 3.3.4
 
 ###### Exmaples ######

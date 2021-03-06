@@ -60,36 +60,12 @@ def injector_main(data: dict) -> dict:
     M = data["M_coeff"]
     jet_LD = data["jet_LD"]
     orifice_LD = data["orifice_LD"]
+    
     """
     First, find the desired total injector area using an estimated Cd and target mass 
     flow rate (x_mdot), assuming constant density for nitrous oxide. Note that real nitrous
     behaves through two-phase flow (both gaseous and liquid), so increasing the injector area
     will increase the actual oxidizer mass flow rate.
-
-    Steps:
-        - Find total flow coefficient (Cv)
-        - Convert Cv into CdA; CdA = Cv/sqrt(2/rho_H2O)
-            - Cv is in [gallons/min]/sqrt([psi]), need to convert metric
-            - i.e. convert GPM to m^3/s and psi^-0.5 to Pa^-0.5
-            - Conversion factor of equation's right-hand-side: 7.59805e-07
-            - (Try: 1 gpm/(1 psi)^0.5*sqrt(1 kg/m^3) in WolframAlpha)
-            - So, 7.59805e-07*Cv/sqrt(2/rho_H2O) = CdA [m^2]
-        - Combine valve's CdA with injector CdA to find effective CdA 
-
-    A_inj_total_o = mdot_o/(Cd_o * np.sqrt(2*rho_o*P0*(delta_p/100))) 
-    A_inj_total_f = mdot_f/(Cd_f * np.sqrt(2*rho_f*P0*(delta_p/100)))
-    Cv_eff_o = total_cv(data["fuel"]["valve_cvs"]) # Effective total Cv of all valves
-    if Cv_eff_o == 0: # User input indicated no propellant valves; simply use A_inj
-        CdA_eff_o = A_inj_total_o
-    else:
-        CdA_mpv_o = Cv_eff_o*7.59805e-07/np.sqrt(2/1000) # 1000 kg/m^3, density of water
-        CdA_eff_o = 1/np.sqrt((1/(CdA_mpv_o**2))+(1/(A_inj_total_o**2))) # in [m^2]
-    Cv_eff_f = total_cv(data["ox"]["valve_cvs"]) # Effective total Cv of all valves
-    if Cv_eff_f == 0: # User input indicated no propellant valves; simply use A_inj
-        CdA_eff_f = A_inj_total_f
-    else:
-        CdA_mpv_f = Cv_eff_f*7.59805e-07/np.sqrt(2/1000) # 1000 kg/m^3, density of water
-        CdA_eff_f = 1/np.sqrt((1/(CdA_mpv_f**2))+(1/(A_inj_total_f**2))) # in [m^2]
     """
 
     if data["ox"]["injector_area"] is None or data["fuel"]["injector_area"] is None:
@@ -97,36 +73,6 @@ def injector_main(data: dict) -> dict:
         A_inj_total_o = mdot_o/(Cd_o * np.sqrt(2*rho_o*P0*(delta_p/100))) 
         A_inj_total_f = mdot_f/(Cd_f * np.sqrt(2*rho_f*P0*(delta_p/100)))
 
-        """
-        # Mass flow rate of a single orifice
-        mdot_o_orifice = Cd_o * (np.pi * ((d_o/2) * 0.001)**2) * np.sqrt(2 * rho_o * P0 * delta_p/100)
-        mdot_f_orifice = Cd_f * (np.pi * ((d_f/2) * 0.001)**2) * np.sqrt(2 * rho_f * P0 * delta_p/100)
-        # Number of orifices
-        n_o = mdot_o / mdot_o_orifice
-        n_f = mdot_f / mdot_f_orifice
-        n_o = round(n_o) if round(n_o) % 2 == 0 else round(n_o) + 1
-        n_f = round(n_f) if round(n_f) % 2 == 0 else round(n_f) + 1
-        # Diameter of orifice
-        d_o = 2 * np.sqrt(mdot_o/(Cd_o * n_o * np.pi * np.sqrt(2 * rho_o * P0 * delta_p/100))) * 1000 
-        d_f = 2 * np.sqrt(mdot_f/(Cd_f * n_f * np.pi * np.sqrt(2 * rho_f * P0 * delta_p/100))) * 1000
-        # Area of orifices
-        a_o = np.pi * (d_o/2)**2 
-        a_f = np.pi * (d_f/2)**2
-        # Length of fluid jets
-        L_jet_o = jet_LD * d_o
-        L_jet_f = jet_LD * d_f
-        # Point of impingment
-        L_poi_o = L_jet_o * np.cos(np.deg2rad(imp_angle/2))
-        L_poi_f = L_jet_f * np.cos(np.deg2rad(imp_angle/2))
-        # Length (thickness) of injector
-        L_inj = orifice_LD * max(d_o, d_f) * np.cos(np.deg2rad(imp_angle / 2))
-        # Distance between orifice (in an element pair) on combustion chamber side
-        d_com_f = 2 * L_jet_f * np.sin(np.deg2rad(imp_angle / 2)) 
-        d_com_o = 2 * L_jet_o * np.sin(np.deg2rad(imp_angle / 2))
-        # Distance between orifice (in a pair) on injector side
-        d_man_f = (d_com_o/L_poi_o) * (L_inj + L_poi_o)
-        d_man_o = (d_com_f/L_poi_f) * (L_inj + L_poi_f) 
-        """
     else: # Both injector areas are driving parameters
         A_inj_total_o = data["ox"]["injector_area"]
         A_inj_total_f = data["fuel"]["injector_area"]
@@ -158,6 +104,10 @@ def injector_main(data: dict) -> dict:
     d_man_f = (d_com_o/L_poi_o) * (L_inj + L_poi_o)
     d_man_o = (d_com_f/L_poi_f) * (L_inj + L_poi_f)
 
+    data["ox"]["injector_area"] = A_inj_total_o
+    data["fuel"]["injector_area"] = A_inj_total_f
+    data["x_mdot_o"] = mdot_o
+    data["x_mdot_f"] = mdot_f
     data["n_o"] = n_o
     data["n_f"] = n_f
     data["d_o"] = d_o
@@ -170,9 +120,15 @@ def injector_main(data: dict) -> dict:
     data["L_poi_f"] = L_poi_f
     data["L_inj"] = L_inj
     data["d_com_f"] = d_com_f
-    data["d_man_o"] = d_man_o
+    data["d_com_o"] = d_com_o
     data["d_man_f"] = d_man_f
     data["d_man_o"] = d_man_o
+
+    # Tank volumes = target_mdot * burn_time
+    if data["ox"]["V_l"] is None: 
+        data["ox"]["V_l"] = data["x_mdot_o"]*data["t_b"]
+    if data["fuel"]["V_l"] is None:
+        data["fuel"]["V_l"] = data["x_mdot_f"]*data["t_b"]
     
     return data
 
@@ -189,3 +145,35 @@ def total_cv(valve_cvs: list or np.ndarray or float) -> float:
             temp_sum += 1/(valve_cvs[i]**2)
         cv = np.sqrt(temp_sum**-1)
         return cv
+
+
+"""
+# Mass flow rate of a single orifice
+mdot_o_orifice = Cd_o * (np.pi * ((d_o/2) * 0.001)**2) * np.sqrt(2 * rho_o * P0 * delta_p/100)
+mdot_f_orifice = Cd_f * (np.pi * ((d_f/2) * 0.001)**2) * np.sqrt(2 * rho_f * P0 * delta_p/100)
+# Number of orifices
+n_o = mdot_o / mdot_o_orifice
+n_f = mdot_f / mdot_f_orifice
+n_o = round(n_o) if round(n_o) % 2 == 0 else round(n_o) + 1
+n_f = round(n_f) if round(n_f) % 2 == 0 else round(n_f) + 1
+# Diameter of orifice
+d_o = 2 * np.sqrt(mdot_o/(Cd_o * n_o * np.pi * np.sqrt(2 * rho_o * P0 * delta_p/100))) * 1000 
+d_f = 2 * np.sqrt(mdot_f/(Cd_f * n_f * np.pi * np.sqrt(2 * rho_f * P0 * delta_p/100))) * 1000
+# Area of orifices
+a_o = np.pi * (d_o/2)**2 
+a_f = np.pi * (d_f/2)**2
+# Length of fluid jets
+L_jet_o = jet_LD * d_o
+L_jet_f = jet_LD * d_f
+# Point of impingment
+L_poi_o = L_jet_o * np.cos(np.deg2rad(imp_angle/2))
+L_poi_f = L_jet_f * np.cos(np.deg2rad(imp_angle/2))
+# Length (thickness) of injector
+L_inj = orifice_LD * max(d_o, d_f) * np.cos(np.deg2rad(imp_angle / 2))
+# Distance between orifice (in an element pair) on combustion chamber side
+d_com_f = 2 * L_jet_f * np.sin(np.deg2rad(imp_angle / 2)) 
+d_com_o = 2 * L_jet_o * np.sin(np.deg2rad(imp_angle / 2))
+# Distance between orifice (in a pair) on injector side
+d_man_f = (d_com_o/L_poi_o) * (L_inj + L_poi_o)
+d_man_o = (d_com_f/L_poi_f) * (L_inj + L_poi_f) 
+"""

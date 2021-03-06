@@ -14,6 +14,7 @@ import time
 import subprocess
 import threading
 import pyautogui
+from typing import Tuple
 from helpers.misc import print_header
 
 
@@ -128,8 +129,8 @@ def cea_outparse(data: dict, case_name: str, case_dir: str) -> dict:
     return data
 
 
-def cea_main(data: dict, case_name: str):
+def cea_main(data: dict, case_name: str) -> Tuple[dict, str]:
     case_dir = cea_inp(data, case_name)
     driver_cea(case_name, case_dir)
     data = cea_outparse(data, case_name, case_dir)
-    return data
+    return data, case_dir

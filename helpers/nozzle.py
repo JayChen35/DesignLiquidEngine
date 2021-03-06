@@ -131,9 +131,9 @@ def nozzle_main(data: dict) -> dict:
     data["nozzle"]["Ldn"] = Ldn
     data["nozzle"]["Lcn"] = Lcn
 
-    data["d_throat"] = Rt*2
-    data["d_cc"] = Rc*2
-    data["length_cc"] = Lc
-    data["exp_ratio"] = ER
+    data["d_throat"] = Rt*2 if data["d_throat"] is None else data["d_throat"]
+    data["d_cc"] = Rc*2 if data["d_cc"] is None else data["d_cc"]
+    data["length_cc"] = Lc if data["length_cc"] is None else data["length_cc"]
+    data["exp_ratio"] = ER if data["exp_ratio"] is None else data["exp_ratio"]
 
     return data
