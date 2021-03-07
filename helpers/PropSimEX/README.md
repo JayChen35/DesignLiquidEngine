@@ -1,6 +1,19 @@
 # PropSimEX
 
 PropSim integrated executable source code. Runs a liquid rocket engine simulator.
+To run on Windows systems:
+
+```properties
+./PropSimIntegrated.exe PropSimInput.json
+```
+
+To run on macOS/Linux systems:
+
+```properties
+./run_PropSimIntegrated.sh $MCR_PATH/v99 PropSimInput.json
+```
+
+Here, $MCR_PATH is the path to your MATLAB Complier Runtime (usually somewhere under /usr/local/).
 
 ## MATLAB Compiler
 

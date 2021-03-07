@@ -40,11 +40,11 @@ def cea_inp(data: dict, case_name: str) -> str:
         f.write(line_4)
         line_5 = "react\n"
         f.write(line_5)
-        line_6 = f"  fuel=C2H5OH(L) wt=95  t,k={data['temp']}\n"
+        line_6 = f"  fuel=C2H5OH(L) wt=95  t,k={data['T_amb']}\n"
         f.write(line_6)
-        line_7 = f"  fuel=H2O(L) wt=5  t,k={data['temp']}\n"
+        line_7 = f"  fuel=H2O(L) wt=5  t,k={data['T_amb']}\n"
         f.write(line_7)
-        line_8 = f"  oxid=N2O wt=100  t,k={data['temp']}\n"
+        line_8 = f"  oxid=N2O wt=100  t,k={data['T_amb']}\n"
         f.write(line_8)
         line_9 = "end"
         f.write(line_9)
@@ -57,14 +57,14 @@ def driver_cea(case_name: str, case_dir: str):
     """ Driver for running the CEA executable. """
     cea_exe_dir = "./CEAexec/cea-exec/"
     # Move .inp file to same directory as FCEA2m.exe
-    os.rename(f"{case_dir}/{case_name}.inp", f"./CEAexec/cea-exec/{case_name}.inp")
+    shutil.move(f"{case_dir}/{case_name}.inp", f"./CEAexec/cea-exec/{case_name}.inp")
     t1 = threading.Thread(target=type_with_delay, args=(case_name, 0.25), daemon=True)
     t1.start()
     subprocess.call([cea_exe_dir + "FCEA2m.exe"], cwd=cea_exe_dir)
     t1.join()
     # Move .inp and .out file to original directory
-    os.rename(f"./CEAexec/cea-exec/{case_name}.inp", f"{case_dir}/{case_name}.inp")
-    os.rename(f"./CEAexec/cea-exec/{case_name}.out", f"{case_dir}/{case_name}.out")
+    shutil.move(f"./CEAexec/cea-exec/{case_name}.inp", f"{case_dir}/{case_name}.inp")
+    shutil.move(f"./CEAexec/cea-exec/{case_name}.out", f"{case_dir}/{case_name}.out")
     print(f"CEA execution complete. {case_name}.out saved to {case_dir}.")
 
     

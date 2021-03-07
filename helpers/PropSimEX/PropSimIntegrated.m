@@ -4,7 +4,10 @@
 % Driver for running PerformaceCode.m
 
 %% Preprocessing
-function [] = PropSimIntegrated()
+function [] = PropSimIntegrated(json_path)
+    %% Ingest PropSimInput (JSON)
+    data = jsondecode(fileread(json_path));
+    
     %% Unit Conversion
     psi_to_Pa = 6894.75729; % 1 psi in Pa
     in_to_m = 0.0254; % 1 in in m
@@ -16,9 +19,9 @@ function [] = PropSimIntegrated()
 
     %% Options
     % 1: simulate combustion (hot fire), 0: no combustion (cold flow)
-    mode.combustion_on = 1;
+    mode.combustion_on = data.mode.combustion_on;
     % 1: simulate flight conditions (i.e. acceleration head), 0: ground test
-    mode.flight_on = 0;
+    mode.flight_on = data.mode.flight_on;
 
     %-------Gases-----------------------
     helium = Gas();
@@ -31,115 +34,130 @@ function [] = PropSimIntegrated()
 
     %-------Injector Properties----------
     % Injector Exit Area
-    inputs.ox.injector_area = 2.571e-05; % m^2
-    inputs.fuel.injector_area = 6.545e-06; % 4.571e-06 m^2
+    inputs.ox.injector_area = data.ox.injector_area; % m^2
+    inputs.fuel.injector_area = data.fuel.injector_area; % 4.571e-06 m^2
 
     % Fuel line valve Cv values (flow coefficients), assumed in series
-    inputs.fuel.valve_cvs = [0.9 0.7]; % Leave array empty/zero if no propellant valves
-    inputs.ox.valve_cvs = [0.9 0.7];
+    inputs.fuel.valve_cvs = data.fuel.valve_cvs; % Leave array empty/zero if no propellant valves
+    inputs.ox.valve_cvs = data.ox.valve_cvs;
 
     % Ball Valve Time to Injector Area (s)
-    inputs.dt_valve_open = 0.01;
+    inputs.dt_valve_open = data.dt_valve_open;
 
     % Discharge Coefficient
-    inputs.ox.Cd_injector = 0.9;
-    inputs.fuel.Cd_injector = 0.88;
+    inputs.ox.Cd_injector = data.ox.Cd_injector;
+    inputs.fuel.Cd_injector = data.fuel.Cd_injector;
 
     %-------Rocket Properties--------
     % Rocket Dry Mass
-    inputs.mass_dry_rocket = 30*lbm_to_kg;
+    inputs.mass_dry_rocket = data.mass_dry_rocket*lbm_to_kg;
 
     %-------Oxidizer Properties--------
     % Tank Volume
-    inputs.ox.V_tank = 11.564*L_to_m3; 
+    inputs.ox.V_tank = data.ox.V_tank*L_to_m3; 
 
     % Nitrous Volume
-    inputs.ox.V_l = 4.208*L_to_m3; % 3.59
+    inputs.ox.V_l = data.ox.V_l*L_to_m3; % 3.59
 
     % Tank Inner Diameter
-    inputs.ox.tank_id = 5*in_to_m;
+    inputs.ox.tank_id = data.ox.tank_id*in_to_m;
 
     % Distance from Bottom of Tank to Injector
-    inputs.ox.h_offset_tank = 2; % 0 m
+    inputs.ox.h_offset_tank = data.ox.h_offset_tank; % 0 m
 
     % Main Flow Line Diameter
-    inputs.ox.d_flowline = .5*in_to_m;
+    inputs.ox.d_flowline = data.ox.d_flowline*in_to_m;
 
     % Tank Temperature (K)
-    inputs.ox.T_tank = 300;
+    inputs.ox.T_tank = data.ox.T_tank;
 
     %-------Oxidizer Pressurant Properties--------
     inputs.ox_pressurant = Pressurant('oxidizer');
-    inputs.ox_pressurant.gas_properties = helium;
-    inputs.ox_pressurant.set_pressure = 750*psi_to_Pa;
-    inputs.ox_pressurant.storage_initial_pressure = 0*psi_to_Pa;
-    inputs.ox_pressurant.tank_volume = 0*L_to_m3;
-    inputs.ox_pressurant.flow_CdA = 8*mm_to_m^2;
+    if data.ox_pressurant.gas_properties == 0
+        inputs.ox_pressurant.gas_properties = nitrogen;
+    else
+        inputs.ox_pressurant.gas_properties = helium;
+    end
+    inputs.ox_pressurant.set_pressure = ...
+        data.ox_pressurant.set_pressure*psi_to_Pa;
+    inputs.ox_pressurant.storage_initial_pressure = ...
+        data.ox_pressurant.storage_initial_pressure*psi_to_Pa;
+    inputs.ox_pressurant.tank_volume = ...
+        data.ox_pressurant.tank_volume*L_to_m3;
+    inputs.ox_pressurant.flow_CdA = data.ox_pressurant.flow_CdA; 
+    % inputs.ox_pressurant.flow_CdA = 8*mm_to_m^2;
 
     % Are You Supercharging? (0 for 'NO' 1 for 'YES')
-    inputs.ox_pressurant.active = 0;
+    inputs.ox_pressurant.active = data.ox_pressurant.active;
 
     %-------Fuel Properties--------
     % Tank Volume
-    inputs.fuel.V_tank = 11.564*L_to_m3; 
+    inputs.fuel.V_tank = data.fuel.V_tank*L_to_m3; 
 
     % Fuel Volume
-    inputs.fuel.V_l = 4*L_to_m3; % 0.881
+    inputs.fuel.V_l = data.fuel.V_l*L_to_m3; % 0.881
 
     % Tank Inner Diameter
-    inputs.fuel.tank_id = 5*in_to_m;
+    inputs.fuel.tank_id = data.fuel.tank_id*in_to_m;
 
     % Distance from Bottom of Tank to Injector
-    inputs.fuel.h_offset_tank = 24*in_to_m; % 24*in_to_m
+    inputs.fuel.h_offset_tank = data.fuel.h_offset_tank*in_to_m; % 24*in_to_m
 
     % Main Flow Line Diameter(in)
-    inputs.fuel.d_flowline = .5*in_to_m;
+    inputs.fuel.d_flowline = data.fuel.d_flowline*in_to_m;
 
-    inputs.fuel.rho = 789; %Kg/m^3
+    inputs.fuel.rho = data.rho_f; %Kg/m^3
 
     %-------Fuel Pressurant Properties--------
     inputs.fuel_pressurant = Pressurant('fuel');
-    inputs.fuel_pressurant.gas_properties = nitrogen;
-    inputs.fuel_pressurant.set_pressure = 750*psi_to_Pa; % 326 psi
-    inputs.fuel_pressurant.storage_initial_pressure = 0*psi_to_Pa;
-    inputs.fuel_pressurant.tank_volume = 0.0*L_to_m3;
-    inputs.fuel_pressurant.flow_CdA = 8*mm_to_m^2;
+    if data.fuel_pressurant.gas_properties == 0
+        inputs.fuel_pressurant.gas_properties = nitrogen;
+    else
+        inputs.fuel_pressurant.gas_properties = helium;
+    end
+    inputs.fuel_pressurant.set_pressure = ...
+        data.fuel_pressurant.set_pressure*psi_to_Pa;
+    inputs.fuel_pressurant.storage_initial_pressure = ...
+        data.fuel_pressurant.storage_initial_pressure*psi_to_Pa;
+    inputs.fuel_pressurant.tank_volume = ...
+        data.fuel_pressurant.tank_volume*L_to_m3;
+    inputs.fuel_pressurant.flow_CdA = data.fuel_pressurant.flow_CdA; 
 
     % Are You Supercharging? (0 for 'NO' 1 for 'YES')
-    inputs.fuel_pressurant.active = 1;
+    inputs.fuel_pressurant.active = data.fuel_pressurant.active;
 
     %-------Other Properties--------
     % Combustion chamber dimensions
-    inputs.length_cc = 0.258; % m
-    inputs.d_cc = 0.08; % m
+    inputs.length_cc = data.length_cc; % m
+    inputs.d_cc = data.d_cc; % m
 
     % Estimated nozzle efficiency
-    inputs.nozzle_efficiency = 0.95;
-    inputs.nozzle_correction_factor = 0.9830;
+    inputs.nozzle_efficiency = data.nozzle_efficiency;
+    inputs.nozzle_correction_factor = data.nozzle_correction_factor;
 
     % Estimated combustion efficiency
-    inputs.c_star_efficiency = 0.85;
+    inputs.c_star_efficiency = data.c_star_efficiency;
 
     % Nozzle Throat diameter
-    inputs.d_throat = 30.46e-3;
+    inputs.d_throat = data.d_throat;
 
     % Expansion Ratio
-    inputs.exp_ratio = 3.26;
+    inputs.exp_ratio = data.exp_ratio;
 
     % Ambient Temperature
-    inputs.T_amb = 292; % K
+    inputs.T_amb = data.T_amb; % K
 
     % Ambient Pressure
-    inputs.p_amb = 9.554e04; % Pa
+    inputs.p_amb = data.P3; % Pa
 
     % Load Combustion Data
     inputs.comb_data = load('CombustionData_T1_N2O.mat'); 
     inputs.comb_data = inputs.comb_data.CombData;
 
     %-------Other Options--------
-    options.t_final   =  60;   % Integration time limit
-    options.dt        = 0.01;  % Timestep [s]
-    options.output_on = true;  % Whether or not to print/plot
+    options.t_final   = data.options.t_final;   % Integration time limit
+    options.dt        = data.options.dt;        % Timestep [s]
+    options.output_on = data.options.output_on; % Whether or not to print/plot
 
     %% Run Performance Code
     PerformanceCode(inputs, mode, options);

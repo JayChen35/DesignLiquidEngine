@@ -131,9 +131,9 @@ def nozzle_main(data: dict) -> dict:
     data["nozzle"]["Ldn"] = Ldn
     data["nozzle"]["Lcn"] = Lcn
 
-    data["d_throat"] = Rt*2 if data["d_throat"] is None else data["d_throat"]
-    data["d_cc"] = Rc*2 if data["d_cc"] is None else data["d_cc"]
-    data["length_cc"] = Lc if data["length_cc"] is None else data["length_cc"]
-    data["exp_ratio"] = ER if data["exp_ratio"] is None else data["exp_ratio"]
+    data["d_throat"] = Rt*2 if data["d_throat"] is None else data["d_throat"] # [m] Diameter of throat
+    data["d_cc"] = Rc*2 if data["d_cc"] is None else data["d_cc"] # [m] Diameter of combustion chamber (CC)
+    data["length_cc"] = Lc if data["length_cc"] is None else data["length_cc"] # [m] Length of CC
+    data["exp_ratio"] = ER if data["exp_ratio"] is None else data["exp_ratio"] # [~] Expansion ratio
 
     return data
