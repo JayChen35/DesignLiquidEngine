@@ -24,7 +24,6 @@ E = A_exit/A_throat; % Expansion ratio []
 
 R_u = 8.3144621; % Universal gas constant [J/mol*K]
 R_spec = R_u/M;
-
 rho0 = p0/(R_spec*T0);
 
 %% Determine Regime of Nozzle Flow

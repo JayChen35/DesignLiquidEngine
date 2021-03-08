@@ -267,6 +267,11 @@ M_air = 0.02897; % mean molecular mass of air [kg/mol]
 rho_air = 1.225; % kg/m^3
 gamma_air = 1.4;
 
+% state.m_cc = state.V_cc*rho_air;
+% state.M_cc = inputs.M_cc;
+% state.gamma_cc = inputs.gamma_cc;
+% state.T_cc = inputs.T_cc;
+
 state.m_cc = state.V_cc*rho_air;
 state.M_cc = M_air;
 state.gamma_cc = gamma_air;
@@ -674,8 +679,7 @@ elseif Pc > CombData.Pc_range(2)
     Pc = CombData.Pc_range(2);
 end
 
-% Use empirical formula to calculate chamber temperature, exhaust
-% properties
+% Use empirical formula to calculate chamber temperature, exhaust properties
 iTc = FastInterp2(CombData.OF, CombData.Pc, CombData.Tc, OF, Pc);
 iMW = FastInterp2(CombData.OF, CombData.Pc, CombData.M, OF, Pc);
 R_ex = R_u/iMW;

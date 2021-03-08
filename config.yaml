@@ -28,7 +28,7 @@ ox: # Oxidizer (nitrous oxide) properties
   V_tank        : 8    # [L] Propellant tank volume (around 60 cubic feet)
   V_l           : null # [L] Liquid nitrous volume (null = caclulated via mdot*t_b)
   tank_id       : 5    # [in] Tank inner diameter
-  h_offset_tank : 2    # [m] Distance from bottom of tank to injector
+  h_offset_tank : 2    # [in] Distance from bottom of tank to injector
   d_flowline    : 0.5  # [in] Main flow line diameter
   T_tank        : 300  # [K] Tank temperature
 ox_pressurant: # Properties for the gaseous oxidizer pressurant (nitrous)
@@ -48,7 +48,7 @@ fuel: # Fuel (95% ethyl alcohol) properties
   V_tank        : 4    # [L] Propellant tank volume (around 30 cubic feet)
   V_l           : null # [L] Liquid ethanol volume (null = caclulated via mdot*t_b)
   tank_id       : 5    # [in] Tank inner diameter
-  h_offset_tank : 2    # [m] Distance from bottom of tank to injector
+  h_offset_tank : 2    # [in] Distance from bottom of tank to injector
   d_flowline    : 0.5  # [in] Main flow line diameter
   T_tank        : 300  # [K] Tank temperature
 fuel_pressurant: # Properties for the gaseous oxidizer pressurant (nitrous)
@@ -87,6 +87,10 @@ options:
   t_final   : 60
   dt        : 0.01
   output_on : null # Corresponds with (is equal to) `plot_on`
+test_data:
+  test_plots_on : false # Import tests data and plot against simulation data
+  test_data_file : "5_13_18_data.mat"
+  t_offset : 0 # [s] Time offset of test data with respect to simulation data
 
 #-----Standard Parameters/Constants-----
 # These values are either well-established standards or numerical constants.

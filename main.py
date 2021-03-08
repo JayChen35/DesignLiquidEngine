@@ -52,7 +52,7 @@ def main(cmd_args: list) -> Tuple[dict, float, str]:
                 data = yaml.safe_load(f)
             assert type(data) == dict
             terminal = True
-            check_valid_input(data, {np.float64, float, int, bool, type(None)})
+            check_valid_input(data, {np.float64, float, int, bool, type(None), str})
         except IOError or ValueError or AssertionError:
             print_header("Invalid file path. Please ensure the file path is typed correctly.")
             if contains_cmd_args: sys.exit(0)

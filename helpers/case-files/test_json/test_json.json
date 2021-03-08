@@ -76,6 +76,11 @@
         "dt": 0.01,
         "output_on": true
     },
+    "test_data": {
+        "test_plots_on": false,
+        "test_data_file": "5_13_18_data.mat",
+        "t_offset": 0
+    },
     "imp_angle": 60,
     "M_coeff": 1.6,
     "jet_LD": 6,

@@ -6,7 +6,7 @@
 %% Preprocessing
 addpath(fullfile(pwd, 'Supporting Functions'))
 clc;
-clear all; % "All" is necessary to clear previous Ox Mass Flux arrays
+clear;
 close all;
 
 %% Unit Conversion
@@ -24,12 +24,26 @@ mode.combustion_on = 1;
 % 1: simulate flight conditions (i.e. acceleration head), 0: ground test
 mode.flight_on = 0;
 
+%% Options
+test_data.test_plots_on = 0; % Import tests data and plot against simulation data
+test_data.test_data_file = '5_13_18_data.mat'; % File from which to import test data
+test_data.t_offset = 0; % Time offset of test data wrt simulation data [s]
+
+% 1: simulate combustion (hot fire), 0: no combustion (cold flow)
+mode.combustion_on = 1;
+% 1: simulate flight conditions (i.e. acceleration head), 0: ground test 
+% conditions
+mode.flight_on = 0; % Currently does not work if flight_on = 1
+% 'hybrid' for solid fuel, liquid oxidizer, 'liquid' for liquid fuel and
+% oxidizer
+mode.type = 'liquid';
+
 %% Input Parameters
 inputs.CombustionData = fullfile('Combustion Data', 'CombustionData_T1_N2O.mat');
 
 %-------Gases-----------------------
 helium = Gas();
-helium.c_v = 3.12; % J/kg*K
+helium.c_v = 3.12*1e03; % J/kg*K
 helium.molecular_mass = 4.0026e-3; % kg/mol
 
 nitrogen = Gas();
@@ -39,11 +53,11 @@ nitrogen.molecular_mass = 2*14.0067e-3; % kg/mol
 %-------Injector Properties----------
 % Injector Exit Area
 inputs.ox.injector_area = 2.571e-05; % m^2
-inputs.fuel.injector_area = 6.545e-06; % 4.571e-06 m^2
+inputs.fuel.injector_area = 6.545e-07; % 4.571e-06 m^2
 
 % Fuel line valve Cv values (flow coefficients), assumed in series
-inputs.fuel.valve_cvs = [0.9 0.7]; % Leave array empty/zero if no propellant valves
-inputs.ox.valve_cvs = [0.9 0.7];
+inputs.fuel.valve_cvs = [0.9]; % Leave array empty/zero if no propellant valves
+inputs.ox.valve_cvs = [0.9];
 
 % Ball Valve Time to Injector Area (s)
 inputs.dt_valve_open = 0.01;
@@ -78,7 +92,7 @@ inputs.ox.T_tank = 300;
 %-------Oxidizer Pressurant Properties--------
 inputs.ox_pressurant = Pressurant('oxidizer');
 inputs.ox_pressurant.gas_properties = helium;
-inputs.ox_pressurant.set_pressure = 750*psi_to_Pa;
+inputs.ox_pressurant.set_pressure = 0*psi_to_Pa;
 inputs.ox_pressurant.storage_initial_pressure = 0*psi_to_Pa;
 inputs.ox_pressurant.tank_volume = 0*L_to_m3;
 inputs.ox_pressurant.flow_CdA = 8*mm_to_m^2;

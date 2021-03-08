@@ -16,7 +16,7 @@ def propsim_main(data: dict, case_dir: str):
     """ Compiles parameters and calls propsim.exe or propsim.sh. """
     # Check that the data dictionary is valid and all nulls are filled
     data["options"]["output_on"] = True if data["plot_on"] else False
-    if not check_valid_input(data):
+    if not check_valid_input(data, {np.float64, float, int, bool, str}):
         error_string = "ERROR: The configuration (.yaml) file received invalid inputs, or there was an internal"+\
             " calculation error. Check that all nulls in the YAML are in valid places, and try running main.py"+\
             " with the default `config.yaml` file to check basic capability. See README.md for more details."

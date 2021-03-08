@@ -25,7 +25,7 @@ function [] = PropSimIntegrated(json_path)
 
     %-------Gases-----------------------
     helium = Gas();
-    helium.c_v = 3.12; % J/kg*K
+    helium.c_v = 3.12*1e06; % J/kg*K
     helium.molecular_mass = 4.0026e-3; % kg/mol
 
     nitrogen = Gas();
