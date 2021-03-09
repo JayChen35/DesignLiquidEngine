@@ -76,6 +76,15 @@
         "dt": 0.01,
         "output_on": true
     },
+    "test_data": {
+        "test_plots_on": false,
+        "test_data_file": "5_13_18_data.mat",
+        "t_offset": 0
+    },
+    "propsim_io": {
+        "input_file": "PropSimInput",
+        "output_file": "PropSimOutput"
+    },
     "imp_angle": 60,
     "M_coeff": 1.6,
     "jet_LD": 6,
@@ -122,5 +131,5 @@
     "d_com_o": 9.923253311989004,
     "d_man_f": 21.500382175976178,
     "d_man_o": 17.891127659678222,
-    "case_name": "test_json"
+    "case_name": "test_case_1"
 }

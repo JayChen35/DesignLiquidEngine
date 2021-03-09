@@ -4,7 +4,6 @@
 # Developed on April 22nd, 2018
 
 """ 
-
 This program generates important parameters in a conical supersonic converging-diverging
 nozzle from certain user inputs. Below is a full list of this program's capabilities and
 key thermodynamic assumptions. Many input parameters can be obtained from NASA's CEA program
@@ -65,9 +64,7 @@ OUTPUTS:
     - Lc = Length of the chamber, m
     - Ldn = Length of the diverging nozzle, m
     - Lcn = Length of the converging nozzle, m
-
 """
-
 
 import numpy as np
 import os

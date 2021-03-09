@@ -1,5 +1,5 @@
 # Injector parameter calculation script (like-on-like doublet impingment injector)
-# Authors: Ron Nachum, Jason Chen, Jessica Chen, Tanmay Neema, 
+# Authors: Jason Chen, Ron Nachum, Jessica Chen, Tanmay Neema,
 # Project Caelus, 04 March 2021
 
 """ 
@@ -35,7 +35,6 @@ OUTPUTS:
 
     - L_inj = Injector plate thickness
 """
-
 
 import numpy as np
 import os
