@@ -114,20 +114,45 @@ if options.output_on
 end
 
 %% Plot Results
-if options.output_on
-    if test_data.test_plots_on
-        % Load Imported Data for comparison
-        [test_time, pft, pom, pot, ~, ft, pcc] = LoadDataVars(...
-            test_data.test_data_file, test_data.t_offset);
-    else
+% if options.output_on
+%     if test_data.test_plots_on
+%         % Load Imported Data for comparison
+%         [test_time, pft, pom, pot, ~, ft, pcc] = LoadDataVars(...
+%             test_data.test_data_file, test_data.t_offset);
+%     else
         test_time = [];
         pft = [];
         pom = [];
         pot = [];
         ft = [];
         pcc = [];
-    end
+%     end
 
+    %% Print critical information
+    impulse = trapz(time, F_thrust); % Use trapezoidal integration
+    Mox_initial = record.m_ox(1);
+    Mox = record.m_ox(1) - record.m_ox(end);
+
+    Mfuel_initial = record.m_fuel(1);
+    Mfuel = record.m_fuel(1) - record.m_fuel(end);
+
+    fprintf('Pressurant Mass: %.3f kg\n', record.m_press);
+    fprintf(['Total impulse: %.2f kN*s\t\t\nOxidizer Mass Spent: '...
+        '%.2f kg\t\tOxidizer Mass Remaining: %.2f kg\nFuel Mass Spent: %.2f kg\t\t' ...
+        'Fuel Mass Remaining: %.2f kg\t O/F ratio: %.2f \n']...
+        , impulse/1000, Mox, Mox_initial-Mox, Mfuel, Mfuel_initial - Mfuel, ...
+        Mox/Mfuel);
+    fprintf(['Exit Mach number: %.2f\t\tMean oxidizer mdot: %.2f kg/s'...
+        '\nMean fuel mdot: %.2f kg/s\t\tCritical oxidizer mdot: %.2f kg/s\n']...
+        , mean(M_e(2:length(M_e))), mean(m_dot_ox(2:length(m_dot_ox))), ...
+        mean(m_dot_fuel(2:length(m_dot_fuel))), ...
+        mean(m_dot_ox_crit(2:length(m_dot_ox_crit))));
+    fprintf('Isp: %.2f s\t\tC*: %.1f m/s\t\tC_f: %.2f\n', ...
+        record.Isp/g_0, record.c_star, record.c_f);
+    % Save output data to a .mat file
+    save(strcat(inputs.output_file, '.mat'), 'record');
+    
+    %% Plot all data from record
     h_figure_1 = figure;
     h_tabgroup = uitabgroup(h_figure_1);
     tab1 = uitab(h_tabgroup,'Title','Thrust');
@@ -289,39 +314,21 @@ if options.output_on
         ylabel('Exit Mach Number ()')
         legend('Simulation')
     end
-
-    %Use trapezoidal integration
-    impulse = trapz(time, F_thrust);
-    Mox_initial = record.m_ox(1);
-    Mox = record.m_ox(1) - record.m_ox(end);
-
-    Mfuel_initial = record.m_fuel(1);
-    Mfuel = record.m_fuel(1) - record.m_fuel(end);
-
-    fprintf('Pressurant Mass: %.3f kg\n', record.m_press)
-    fprintf(['Impulse: %.2f kN*s\t\t\nOxidizer Mass Spent: '...
-        '%.2f kg\t\tOxidizer Mass Remaining: %.2f kg\nFuel Mass Spent: %.2f kg\t\t' ...
-        'Fuel Mass Remaining: %.2f kg\n OF ratio: %.2f \n']...
-        , impulse/1000, Mox, Mox_initial-Mox, Mfuel, Mfuel_initial - Mfuel, ...
-        Mox/Mfuel);
-    fprintf('Isp: %.1f s\t\tC*: %.0f m/s\t\tC_f: %.2f\n', ...
-        record.Isp/g_0, record.c_star, record.c_f)
-    % Save output data to a .mat file
-    save('PropSimOutput.mat', 'record')
-end
+% end
 end
 
-function [test_time, pft, pom, pot, we, ft, pcc] = LoadDataVars(filename, t_offset)
-    test_time = 0;
-    pft = 0;
-    pom = 0;
-    pot = 0;
-    we = 0;
-    ft = 0;
-    pcc = 0;
-    load(['.\Test Data\' filename])
-    test_time = test_time + t_offset;
-    if length(test_time) == 1
-        error('Variable ''test_time'' not present in imported data.\n');
-    end
-end
+%% LoadDataVars
+% function [test_time, pft, pom, pot, we, ft, pcc] = LoadDataVars(filename, t_offset)
+%     test_time = 0;
+%     pft = 0;
+%     pom = 0;
+%     pot = 0;
+%     we = 0;
+%     ft = 0;
+%     pcc = 0;
+%     load(['.\Test Data\' filename])
+%     test_time = test_time + t_offset;
+%     if length(test_time) == 1
+%         error('Variable ''test_time'' not present in imported data.\n');
+%     end
+% end
