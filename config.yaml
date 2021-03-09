@@ -91,6 +91,9 @@ test_data:
   test_plots_on : false # Import tests data and plot against simulation data
   test_data_file : "5_13_18_data.mat"
   t_offset : 0 # [s] Time offset of test data with respect to simulation data
+propsim_io:
+  input_file : "PropSimInput" # This will be a .json file
+  output_file : "PropSimOutput" # This will be a .mat file
 
 #-----Standard Parameters/Constants-----
 # These values are either well-established standards or numerical constants.

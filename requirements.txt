@@ -8,6 +8,7 @@ typing
 
 ###### Requirements with version specifiers ######
 numpy >= 1.18.5
+scipy >= 1.6.0
 matplotlib >= 3.3.4
 
 ###### Exmaples ######

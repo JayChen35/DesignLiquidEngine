@@ -46,7 +46,14 @@ def propsim_main(data: dict, case_dir: str) -> str:
     os.remove(json_temp_path)
     output_file_path = case_dir + f"/{output_file_name}.mat"
     shutil.move(f"./{output_file_name}.mat", output_file_path)
-    print_header(f"PropSimIntegrated.exe successfully executed. Output .mat saved to {output_file_path}.")
+    info = f"PropSimIntegrated.exe successfully executed. Output .mat saved to {output_file_path}."
+    if data["save_data_on"]:
+        output_plot_path = f"./{output_file_name}Plot.fig"
+        if os.path.exists(output_plot_path):
+            new_plot_path = case_dir + f"/{output_file_name}Plot.fig"
+            shutil.move(output_plot_path, new_plot_path)
+            info += f" Output MATLAB figure saved to {new_plot_path}."
+    print_header(info)
     return output_file_path
 
 

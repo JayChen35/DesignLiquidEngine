@@ -114,19 +114,19 @@ if options.output_on
 end
 
 %% Plot Results
-% if options.output_on
-%     if test_data.test_plots_on
-%         % Load Imported Data for comparison
-%         [test_time, pft, pom, pot, ~, ft, pcc] = LoadDataVars(...
-%             test_data.test_data_file, test_data.t_offset);
-%     else
+if options.output_on
+    if test_data.test_plots_on
+        % Load Imported Data for comparison
+        [test_time, pft, pom, pot, ~, ft, pcc] = LoadDataVars(...
+            test_data.test_data_file, test_data.t_offset);
+    else
         test_time = [];
         pft = [];
         pom = [];
         pot = [];
         ft = [];
         pcc = [];
-%     end
+    end
 
     %% Print critical information
     impulse = trapz(time, F_thrust); % Use trapezoidal integration
@@ -160,7 +160,7 @@ end
     tab3 = uitab(h_tabgroup,'Title','Pressure Drop');
     tab4 = uitab(h_tabgroup,'Title','Temperatures');
     tab5 = uitab(h_tabgroup,'Title','Fuel');
-    tab6 = uitab(h_tabgroup,'Title','Oxidizer Mass Flux');
+    % tab6 = uitab(h_tabgroup,'Title','Oxidizer Mass Flux');
     tab7 = uitab(h_tabgroup,'Title','Performance');
     tab8 = uitab(h_tabgroup,'Title','Nozzle');
 
@@ -278,13 +278,13 @@ end
     ylabel('OF Ratio')
     legend('Simulation')
 
-    if mode.combustion_on
-        axes('parent',tab6)
-        plot(time, m_dot_ox./area_core)
-        xlabel('Time (s)')
-        ylabel('Grain Core Oxidizer Mass Flux (kg/m^{2}s)')
-        legend('Simulation')
-    end
+    % if mode.combustion_on
+    %     axes('parent',tab6)
+    %     plot(time, m_dot_ox./area_core)
+    %     xlabel('Time (s)')
+    %     ylabel('Grain Core Oxidizer Mass Flux (kg/m^{2}s)')
+    %     legend('Simulation')
+    % end
 
     axes('parent',tab7)
     if mode.combustion_on
@@ -314,21 +314,27 @@ end
         ylabel('Exit Mach Number ()')
         legend('Simulation')
     end
-% end
+    
+    % Save figure if save_data is on
+    if options.save_data_on
+        saveas(gcf, strcat(inputs.output_file, 'Plot'), 'fig');
+    end
+end
 end
 
 %% LoadDataVars
-% function [test_time, pft, pom, pot, we, ft, pcc] = LoadDataVars(filename, t_offset)
-%     test_time = 0;
-%     pft = 0;
-%     pom = 0;
-%     pot = 0;
-%     we = 0;
-%     ft = 0;
-%     pcc = 0;
-%     load(['.\Test Data\' filename])
-%     test_time = test_time + t_offset;
-%     if length(test_time) == 1
-%         error('Variable ''test_time'' not present in imported data.\n');
-%     end
-% end
+function [test_time, pft, pom, pot, we, ft, pcc] = LoadDataVars(filename, t_offset)
+    test_time = 0;
+    pft = 0;
+    pom = 0;
+    pot = 0;
+    we = 0;
+    ft = 0;
+    pcc = 0;
+    % load(['.\Test Data\' filename])
+    load(filename)
+    test_time = test_time + t_offset;
+    if length(test_time) == 1
+        error('Variable ''test_time'' not present in imported data.\n');
+    end
+end

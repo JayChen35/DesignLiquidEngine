@@ -2,8 +2,7 @@
 # Designs a liquid bipropellant rocket engine given input parameters.
 # Project Caelus, Aphlex 1C Engine
 # Current revision: 26 February, 2021
-# Authors: Jason Chen, Tanmay Neema, Ron Nachum, Anya Mischel, Jessica Chen, Cyril Sharma
-
+# Authors: Jason Chen, Tanmay Neema, Ron Nachum, Anya Mischel, Jessica Chen
 
 import numpy as np
 import os
@@ -18,6 +17,7 @@ from helpers.cea import cea_main
 from helpers.nozzle import nozzle_main
 from helpers.injector import injector_main
 from helpers.propsim import propsim_main, check_valid_input
+from helpers.plotting import plot_output
 
 
 def main(cmd_args: list) -> Tuple[dict, float, str]:
@@ -76,28 +76,19 @@ def main(cmd_args: list) -> Tuple[dict, float, str]:
     # Run injector design code (assuming 2-on-1 doublet impinging injector)
     data = injector_main(data)
     # Run PropSim (liquid engine performance simulator)
-    propsim_main(data, case_dir)
+    output_file_path = propsim_main(data, case_dir)
     # Print calculation outputs
     for key, val in data.items():
         print(f"{key} = {val}")
-    return data, start_time, case_dir
+    return data, start_time, case_dir, output_file_path
 
 
-def plot_output(data: dict):
-    pass
-
-
-def save_output(data: dict):
-    pass
-
-
+# TODO: Design around impulse not t_b, implement save_data_on, organize PropSimInput.json, add to README.md
 if __name__ == "__main__":
     cmd_args = sys.argv # Accepts command line arguements
-    data, start_time, case_dir = main(cmd_args)
+    data, start_time, case_dir, output_file_path = main(cmd_args)
     if data["plot_on"]:
-        plot_output(data)
-    if data["save_data_on"]:
-        save_output(data)
+        plot_output(output_file_path)
     duration = round(time.perf_counter()-start_time, 4)
     case_dir = case_dir[1:].replace("/", "\\") if platform.system() == "Windows" else case_dir[1:]
     output_path = os.getcwd() + case_dir

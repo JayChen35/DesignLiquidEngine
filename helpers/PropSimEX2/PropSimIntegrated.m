@@ -168,9 +168,10 @@ function [] = PropSimIntegrated(json_path)
     inputs.comb_data = inputs.comb_data.CombData;
 
     %-------Other Options--------
-    options.t_final   =  60;   % Integration time limit
-    options.dt        = 0.01;  % Timestep [s]
-    options.output_on = true;  % Whether or not to print/plot
+    options.t_final   = data.options.t_final; % Integration time limit
+    options.dt        = data.options.dt; % Timestep [s]
+    options.output_on = data.options.output_on; % Whether or not to plot
+    options.save_data_on = data.save_data_on; % Saving figures
     
     inputs.input_file = data.propsim_io.input_file; % Name of input file
     inputs.output_file = data.propsim_io.output_file; % Name of output file
