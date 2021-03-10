@@ -7,7 +7,7 @@
     "T_amb": 300,
     "Lstar": 1.25,
     "t_b": 3,
-    "plot_on": true,
+    "plot_on": false,
     "save_data_on": true,
     "ox": {
         "valve_cvs": [
@@ -74,7 +74,7 @@
     "options": {
         "t_final": 60,
         "dt": 0.01,
-        "output_on": true
+        "output_on": false
     },
     "test_data": {
         "test_plots_on": false,

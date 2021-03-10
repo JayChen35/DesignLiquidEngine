@@ -43,7 +43,7 @@ function [] = PropSimIntegrated(json_path)
 
     %-------Injector Properties----------
 
-    %Injector Exit Area
+    % Injector Exit Area
     inputs.ox.injector_area = data.ox.injector_area; % m^2
     inputs.fuel.injector_area = data.fuel.injector_area; % m^2
 
@@ -99,7 +99,7 @@ function [] = PropSimIntegrated(json_path)
     inputs.ox_pressurant.flow_CdA = data.ox_pressurant.flow_CdA; 
     % inputs.ox_pressurant.flow_CdA = 8*mm_to_m^2;
 
-    %Are You Supercharging? (0 for 'NO' 1 for 'YES')
+    % Are You Supercharging? (0 for 'NO' 1 for 'YES')
     inputs.ox_pressurant.active = data.ox_pressurant.active;
 
     %-------Fuel Properties--------

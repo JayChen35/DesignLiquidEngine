@@ -6,6 +6,7 @@
 
 import numpy as np
 import os
+import ast
 import yaml
 import sys
 import time
@@ -17,7 +18,7 @@ from helpers.cea import cea_main
 from helpers.nozzle import nozzle_main
 from helpers.injector import injector_main
 from helpers.propsim import propsim_main, check_valid_input
-from helpers.plotting import plot_output
+from helpers.output import compile_outputs
 
 
 def main(cmd_args: list) -> Tuple[dict, float, str]:
@@ -52,13 +53,18 @@ def main(cmd_args: list) -> Tuple[dict, float, str]:
                 data = yaml.safe_load(f)
             assert type(data) == dict
             terminal = True
-            check_valid_input(data, {np.float64, float, int, bool, type(None), str})
+            if not check_valid_input(data, {np.float64, float, int, bool, type(None), str}):
+                print_header("Invalid configuration file (some data types not allowed). Try again.")
+                sys.exit(0)
         except IOError or ValueError or AssertionError:
             print_header("Invalid file path. Please ensure the file path is typed correctly.")
             if contains_cmd_args: sys.exit(0)
     input_path = temp_path
     # Get ambient pressure given the input altitude
     data["P3"] = get_exit_pressure(data["altitude"])
+    # Add precision to data type
+    data["ox"]["injector_area"] = np.float64(data["ox"]["injector_area"])
+    data["fuel"]["injector_area"] = np.float64(data["fuel"]["injector_area"])
     # Get desired name of output/case files from user
     if not contains_cmd_args:
         temp_name = input("Enter the desired name of output/case files (press [ENTER] to use default): ")
@@ -77,8 +83,10 @@ def main(cmd_args: list) -> Tuple[dict, float, str]:
     data = injector_main(data)
     # Run PropSim (liquid engine performance simulator)
     output_file_path = propsim_main(data, case_dir)
+    # Compile output data into a summary
+    design_dict, summary_path = compile_outputs(data, output_file_path)
     # Print calculation outputs
-    for key, val in data.items():
+    for key, val in design_dict.items():
         print(f"{key} = {val}")
     return data, start_time, case_dir, output_file_path
 
@@ -87,8 +95,6 @@ def main(cmd_args: list) -> Tuple[dict, float, str]:
 if __name__ == "__main__":
     cmd_args = sys.argv # Accepts command line arguements
     data, start_time, case_dir, output_file_path = main(cmd_args)
-    if data["plot_on"]:
-        plot_output(output_file_path)
     duration = round(time.perf_counter()-start_time, 4)
     case_dir = case_dir[1:].replace("/", "\\") if platform.system() == "Windows" else case_dir[1:]
     output_path = os.getcwd() + case_dir

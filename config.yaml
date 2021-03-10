@@ -14,7 +14,7 @@ Lstar    : 1.25    # [m] Mixing length
 t_b      : 3       # [s] Burn time
 
 #------Runtime & Script Parameters-------
-plot_on      : true
+plot_on      : false
 save_data_on : true
 
 #-------Plumbing System Properties-------
@@ -22,8 +22,8 @@ ox: # Oxidizer (nitrous oxide) properties
   # [~] Array of valve flow coefficients (Cv), assumed to be arranged in series
   valve_cvs: # Leave array empty/as zero if no propellant valves
     - 0.9
-    - 1.0
-  injector_area : null # [m^2] Total injector orifice area
+  injector_area : 3.4373e-05
+    # injector_area : null # [m^2] Total injector orifice area
   Cd_injector   : 0.9  # [~] Dischrge coefficient (of injector orifices)
   V_tank        : 8    # [L] Propellant tank volume (around 60 cubic feet)
   V_l           : null # [L] Liquid nitrous volume (null = caclulated via mdot*t_b)
@@ -42,8 +42,8 @@ ox_pressurant: # Properties for the gaseous oxidizer pressurant (nitrous)
 fuel: # Fuel (95% ethyl alcohol) properties
   valve_cvs: # Leave array empty/as zero if no propellant valves
       - 0.9
-      - 1.0
-  injector_area : null # [m^2] Total injector orifice area
+  injector_area : 8.6975e-07
+  # injector_area : null # [m^2] Total injector orifice area
   Cd_injector   : 0.88 # [~] Dischrge coefficient (of injector orifices)
   V_tank        : 4    # [L] Propellant tank volume (around 30 cubic feet)
   V_l           : null # [L] Liquid ethanol volume (null = caclulated via mdot*t_b)

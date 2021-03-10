@@ -9,6 +9,7 @@ import shlex
 import struct
 import platform
 import subprocess
+import scipy.io as spio
 
 
 def print_header(string: str):
@@ -78,6 +79,44 @@ class Struct():
 
     def get_dict(self):
         return self.__dict__
+
+
+def loadmat(filename: str) -> dict:
+    """
+    :DISCLAIMER: This is not my code. Taken from the URL below.
+    https://stackoverflow.com/questions/7008608/scipy-io-loadmat-nested-structures-i-e-dictionaries
+    This function should be called instead of direct spio.loadmat
+    as it cures the problem of not properly recovering python dictionaries
+    from mat files. It calls the function check keys to cure all entries
+    which are still mat-objects
+    """
+    data = spio.loadmat(filename, struct_as_record=False, squeeze_me=True)
+    return _check_keys(data)
+
+
+def _check_keys(d: dict) -> dict:
+    '''
+    Checks if entries in dictionary are mat-objects. If yes
+    todict is called to change them to nested dictionaries
+    '''
+    for key in d:
+        if isinstance(d[key], spio.matlab.mio5_params.mat_struct):
+            d[key] = _todict(d[key])
+    return d        
+
+
+def _todict(matobj) -> dict:
+    '''
+    A recursive function which constructs from matobjects nested dictionaries
+    '''
+    d = dict()
+    for strg in matobj._fieldnames:
+        elem = matobj.__dict__[strg]
+        if isinstance(elem, spio.matlab.mio5_params.mat_struct):
+            d[strg] = _todict(elem)
+        else:
+            d[strg] = elem
+    return d
 
  
 def get_terminal_size():
