@@ -6,7 +6,7 @@
 # The user should leave as `null` if he/she is unsure about the parameter.
 thrust   : 3000    # [N] Thrust
 of_ratio : 4       # [~] Oxidizer-to-fuel ratio
-P0       : 3000000 # [Pa] Chamber pressure
+P0       : 3.0e+03 # [Pa] Chamber pressure
 altitude : 500     # [m] Operational altitude
 frozen   : true    # [~] Frozen/equilibrium combusion
 T_amb    : 300     # [K] Ambient temperature
@@ -20,32 +20,34 @@ save_data_on : true
 #-------Plumbing System Properties-------
 ox: # Oxidizer (nitrous oxide) properties
   # [~] Array of valve flow coefficients (Cv), assumed to be arranged in series
-  valve_cvs: 0 # Leave array empty/as zero if no propellant valves
-  injector_area : .00064373
+  valve_cvs: # Leave array empty/as zero if no propellant valves
+    - 0.9
+  injector_area : 9.4373e-04
   # injector_area : null # [m^2] Total injector orifice area
   Cd_injector   : 0.9  # [~] Dischrge coefficient (of injector orifices)
-  V_tank        : 8    # [L] Propellant tank volume (around 60 cubic feet)
-  V_l           : 2.6324 # 2.6224
+  V_tank        : 6    # [L] Propellant tank volume (around 60 cubic feet)
+  V_l           : 3.0 # 2.6224
   # V_l           : null # [L] Liquid nitrous volume (null = caclulated via mdot*t_b)
-  tank_id       : 5    # [in] Tank inner diameter
+  tank_id       : 7    # [in] Tank inner diameter
   h_offset_tank : 2    # [in] Distance from bottom of tank to injector
   d_flowline    : 0.5  # [in] Main flow line diameter
   T_tank        : 300  # [K] Tank temperature
 ox_pressurant: # Properties for the gaseous oxidizer pressurant (nitrous)
   gas_properties : 0 # 0 = nitrogen, 1 = helium (more inert gases will be added later)
-  set_pressure : 750 # [psi] Set regulator pressure between COPV and propellant tank
-  storage_initial_pressure : 0 # [psi] Initial storage pressure of pressurant; 0 = off
-  tank_volume : 0 # [L] Pressurant storage tank volume
+  set_pressure : 900 # [psi] Set regulator pressure between COPV and propellant tank
+  storage_initial_pressure : 950 # [psi] Initial storage pressure of pressurant; 0 = off
+  tank_volume : 2 # [L] Pressurant storage tank volume
   flow_CdA : 6.4e-5 # [m^2] CdA of flow between storage and propellant tank
-  active: false # Supercharging; pressurizing ox above vapor pressure?
+  active: true # Supercharging; pressurizing ox above vapor pressure?
 
 fuel: # Fuel (95% ethyl alcohol) properties
-  valve_cvs: 0 # Leave array empty/as zero if no propellant valves
-  injector_area : 8.6975e-06
+  valve_cvs: # Leave array empty/as zero if no propellant valves
+    - 0.9
+  injector_area : 4.0e-06 # 8.6975e-06
   # injector_area : null # [m^2] Total injector orifice area
   Cd_injector   : 0.88 # [~] Dischrge coefficient (of injector orifices)
   V_tank        : 4    # [L] Propellant tank volume (around 30 cubic feet)
-  V_l           : 1.8930 # 0.7930
+  V_l           : 1.0 # 0.7930
   # V_l           : null # [L] Liquid ethanol volume (null = caclulated via mdot*t_b)
   tank_id       : 5    # [in] Tank inner diameter
   h_offset_tank : 2    # [in] Distance from bottom of tank to injector
@@ -53,7 +55,7 @@ fuel: # Fuel (95% ethyl alcohol) properties
   T_tank        : 300  # [K] Tank temperature
 fuel_pressurant: # Properties for the gaseous oxidizer pressurant (nitrous)
   gas_properties : 0 # 0 = nitrogen, 1 = helium (more inert gases will be added later)
-  set_pressure : 450 # [psi] Set regulator pressure between COPV and propellant tank
+  set_pressure : 550 # [psi] Set regulator pressure between COPV and propellant tank
   storage_initial_pressure : 0 # [psi] Initial storage pressure of pressurant; 0 = off
   tank_volume : 0 # [L] Pressurant storage tank volume
   flow_CdA : 6.4e-05 # [m^2] CdA of flow between storage and propellant tank
@@ -76,7 +78,7 @@ rho_o : 772.75 # [kg/m^3] Density of oxidizer
 rho_f : 789    # [kg/m^3] Density of fuel
 # Injector parameters
 delta_p : 25.0 # [%] Percent of injector/chamber dP
-min_d_o : 1.58 # [mm] Diameter of oxidizer orifices
+min_d_o : 3.00 # [mm] Diameter of oxidizer orifices
 min_d_f : 1.00 # [mm] Diameter of fuel orifices
 
 #-------PropSim Runtime Parameters-------

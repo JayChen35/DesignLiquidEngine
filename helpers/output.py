@@ -62,7 +62,7 @@ def compile_outputs(data: dict, output_file_path: str) -> tuple:
     design["burn_time"]        = burn_time
     # Cut off extraneous significant figures
     for key, val in design.items():
-        design[key] = np.round(val, decimals=4) if val > 0.1 else val
+        design[key] = np.round(val, 4) if val > 0.1 else round(val, 5-int(np.floor(np.log10(abs(val))))-1)
     # Export to JSON file
     json_obj = json.dumps(design, indent=4, separators=(",", ": "))
     prefix = output_file_path[:output_file_path.rfind("/")]

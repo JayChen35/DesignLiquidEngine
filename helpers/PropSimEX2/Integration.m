@@ -502,17 +502,21 @@ end
 %           - So, 7.59805e-07*Cv/sqrt(2/rho_H2O) = CdA [m^2]
 %       - Combine valve's CdA with injector CdA to find effective CdA 
 
-injector_area = inputs.fuel.Cd_injector*A_inj;
-Cv_eff = TotalCv(inputs.fuel.valve_cvs); % Effective total Cv of all valves
-if Cv_eff == 0 % User input indicated no propellant valves; simply use A_inj
-    CdA_eff = injector_area;
-else
-    CdA_mpv = Cv_eff*7.59805e-07/sqrt(2/1000); % 1000 kg/m^3, density of water
-    CdA_eff = 1/sqrt((1/(CdA_mpv^2))+(1/(injector_area^2))); % in [m^2]
-end
+% injector_area = inputs.fuel.Cd_injector*A_inj;
+% Cv_eff = TotalCv(inputs.fuel.valve_cvs); % Effective total Cv of all valves
+% if Cv_eff == 0 % User input indicated no propellant valves; simply use A_inj
+%     CdA_eff = injector_area;
+% else
+%     CdA_mpv = Cv_eff*7.59805e-07/sqrt(2/1000); % 1000 kg/m^3, density of water
+%     CdA_eff = 1/sqrt((1/(CdA_mpv^2))+(1/(injector_area^2))); % in [m^2]
+% end
+% 
+% m_dot_ox = CdA_eff*G; % m_dot_ox = inputs.ox.Cd_injector*A_inj*G;
+% m_dot_crit = CdA_eff*G_crit; % m_dot_crit = inputs.ox.Cd_injector*A_inj*G_crit;
+% p_crit = p_down_crit;
 
-m_dot_ox = CdA_eff*G; % m_dot_ox = inputs.ox.Cd_injector*A_inj*G;
-m_dot_crit = CdA_eff*G_crit; % m_dot_crit = inputs.ox.Cd_injector*A_inj*G_crit;
+m_dot_ox = inputs.ox.Cd_injector*A_inj*G;
+m_dot_crit = inputs.ox.Cd_injector*A_inj*G_crit;
 p_crit = p_down_crit;
 end
 
@@ -646,19 +650,21 @@ function [m_dot_f, T_dot_drain] = FuelTankMDot(inputs, state, time)
 %           - So, 7.59805e-07*Cv/sqrt(2/rho_H2O) = CdA [m^2]
 %       - Combine valve's CdA with injector CdA to find effective CdA 
 
-injector_area = inputs.fuel.Cd_injector*inputs.fuel.injector_area*inputs.Throttle(time);
-Cv_eff = TotalCv(inputs.fuel.valve_cvs); % Effective total Cv of all valves
-if Cv_eff == 0 % User input indicated no propellant valves; simply use A_inj
-    CdA_eff = injector_area;
-else
-    CdA_mpv = Cv_eff*7.59805e-07/sqrt(2/1000); % 1000 kg/m^3, density of water
-    CdA_eff = 1/sqrt((1/(CdA_mpv^2))+(1/(injector_area^2))); % in [m^2]
-end
+% injector_area = inputs.fuel.Cd_injector*inputs.fuel.injector_area*inputs.Throttle(time);
+% Cv_eff = TotalCv(inputs.fuel.valve_cvs); % Effective total Cv of all valves
+% if Cv_eff == 0 % User input indicated no propellant valves; simply use A_inj
+%     CdA_eff = injector_area;
+% else
+%     CdA_mpv = Cv_eff*7.59805e-07/sqrt(2/1000); % 1000 kg/m^3, density of water
+%     CdA_eff = 1/sqrt((1/(CdA_mpv^2))+(1/(injector_area^2))); % in [m^2]
+% end
 
 % If tank pressure is greater than combustion chamber pressure
-if (state.p_fueltank > state.p_cc)&&(injector_area>0)
+injector_area = inputs.fuel.Cd_injector*inputs.fuel.injector_area*inputs.Throttle(time);
+if (state.p_fueltank > state.p_cc)&&...
+        (injector_area>0)
     G = sqrt(2*(state.p_fueltank-state.p_cc)*inputs.fuel.rho);
-    m_dot_f = CdA_eff*G; % m_dot_f = injector_area*G;
+    m_dot_f = injector_area*G;
 else
     m_dot_f = 0;
 end
@@ -778,17 +784,17 @@ end
 
 
 %% Calculate Total Cv (Flow Coefficient)
-function cv = TotalCv(valve_cvs)
-    if isempty(valve_cvs) || ~ismatrix(valve_cvs)
-        cv = 0;
-    else
-        temp_sum = 0;
-        for i = 1:length(valve_cvs)
-            temp_sum = temp_sum + 1/(valve_cvs(i)^2);
-        end
-        cv = sqrt(temp_sum^-1);
-    end
-end
+% function cv = TotalCv(valve_cvs)
+%     if isempty(valve_cvs) || ~ismatrix(valve_cvs)
+%         cv = 0;
+%     else
+%         temp_sum = 0;
+%         for i = 1:length(valve_cvs)
+%             temp_sum = temp_sum + 1/(valve_cvs(i)^2);
+%         end
+%         cv = sqrt(temp_sum^-1);
+%     end
+% end
 
 
 %% VanDerWaal's Equation for Pressure

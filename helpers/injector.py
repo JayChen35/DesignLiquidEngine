@@ -141,7 +141,7 @@ def injector_main(data: dict) -> dict:
     return data
 
 
-def get_eff_A_inj(data: dict, A_inj: float) -> tuple:
+def get_eff_A_inj(data: dict) -> tuple:
     """ 
     Finds effective injector area. Combines injector area with flow coefficient (Cv) values. 
     Finding the effective CdA throughout the system involves the following steps:
@@ -170,9 +170,9 @@ def get_eff_A_inj(data: dict, A_inj: float) -> tuple:
     
     
 def total_cv(valve_cvs: list or np.ndarray or float or np.float64) -> float:
-    if type(valve_cvs) in {float, np.float64} and valve_cvs != 0:
+    if type(valve_cvs) in {float, np.float64} and valve_cvs > 0:
         return valve_cvs
-    elif valve_cvs <= 0:
+    elif type(valve_cvs) in {float, np.float64} and valve_cvs <= 0:
         return 0
     elif type(valve_cvs) in {list, np.ndarray}:
         if len(valve_cvs) > 0:

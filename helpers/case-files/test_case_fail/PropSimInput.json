@@ -10,13 +10,11 @@
     "plot_on": true,
     "save_data_on": true,
     "ox": {
-        "valve_cvs": [
-            0.9
-        ],
+        "valve_cvs": 0.9,
         "injector_area": 0.00064373,
         "Cd_injector": 0.9,
         "V_tank": 8,
-        "V_l": 3.159689590247218,
+        "V_l": 2.6324,
         "tank_id": 5,
         "h_offset_tank": 2,
         "d_flowline": 0.5,
@@ -27,13 +25,11 @@
         "set_pressure": 750,
         "storage_initial_pressure": 0,
         "tank_volume": 0,
-        "flow_CdA": 0.001,
+        "flow_CdA": 6.4e-05,
         "active": false
     },
     "fuel": {
-        "valve_cvs": [
-            0.9
-        ],
+        "valve_cvs": 0.9,
         "injector_area": 8.6975e-06,
         "Cd_injector": 0.88,
         "V_tank": 4,
@@ -48,7 +44,7 @@
         "set_pressure": 450,
         "storage_initial_pressure": 0,
         "tank_volume": 0,
-        "flow_CdA": 0.001,
+        "flow_CdA": 6.4e-05,
         "active": true
     },
     "dt_valve_open": 0.01,
@@ -129,5 +125,5 @@
     "d_com_o": 2.191680013740442,
     "d_man_f": 9.558011942046667,
     "d_man_o": 13.680330723997272,
-    "case_name": "test_case_4"
+    "case_name": "test_case_fail"
 }

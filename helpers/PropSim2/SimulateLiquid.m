@@ -157,5 +157,50 @@ options.t_final   =  60;   % Integration time limit
 options.dt        = 0.01;  % Timestep [s]
 options.output_on = true;  % Whether or not to print/plot
 
+% Find the effective CdA throughout the system
+%   Steps:
+%       - Find total flow coefficient (Cv)
+%       - Convert Cv into CdA; CdA = Cv/sqrt(2/rho_H2O)
+%           - Cv is in [gallons/min]/sqrt([psi]), need to convert metric
+%           - i.e. convert GPM to m^3/s and psi^-0.5 to Pa^-0.5
+%           - Conversion factor of equation's right-hand-side: 7.59805e-07
+%           - (Try: 1 gpm/(1 psi)^0.5*sqrt(1 kg/m^3) in WolframAlpha)
+%           - So, 7.59805e-07*Cv/sqrt(2/rho_H2O) = CdA [m^2]
+%       - Combine valve's CdA with injector CdA to find effective CdA 
+
+% For the fuel line
+injector_area = inputs.fuel.Cd_injector*inputs.fuel.injector_area;
+Cv_eff = TotalCv(inputs.fuel.valve_cvs); % Effective total Cv of all valves
+if Cv_eff == 0 % User input indicated no propellant valves; simply use A_inj
+    CdA_eff = injector_area;
+else
+    CdA_mpv = Cv_eff*7.59805e-07/sqrt(2/1000); % 1000 kg/m^3, density of water
+    CdA_eff = 1/sqrt((1/(CdA_mpv^2))+(1/(injector_area^2))); % in [m^2]
+end
+inputs.fuel.injector_area = CdA_eff;
+% For the oxidizer line
+injector_area = inputs.ox.Cd_injector*inputs.ox.injector_area;
+Cv_eff = TotalCv(inputs.ox.valve_cvs); % Effective total Cv of all valves
+if Cv_eff == 0 % User input indicated no propellant valves; simply use A_inj
+    CdA_eff = injector_area;
+else
+    CdA_mpv = Cv_eff*7.59805e-07/sqrt(2/1000); % 1000 kg/m^3, density of water
+    CdA_eff = 1/sqrt((1/(CdA_mpv^2))+(1/(injector_area^2))); % in [m^2]
+end
+inputs.ox.injector_area = CdA_eff;
+
 %% Run Performance Code
 PerformanceCode(inputs, mode, test_data, options);
+
+%% Calculate Total Cv (Flow Coefficient)
+function cv = TotalCv(valve_cvs)
+    if isempty(valve_cvs) || ~ismatrix(valve_cvs)
+        cv = 0;
+    else
+        temp_sum = 0;
+        for i = 1:length(valve_cvs)
+            temp_sum = temp_sum + 1/(valve_cvs(i)^2);
+        end
+        cv = sqrt(temp_sum^-1);
+    end
+end

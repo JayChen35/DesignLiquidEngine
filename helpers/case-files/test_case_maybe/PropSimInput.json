@@ -10,8 +10,8 @@
     "plot_on": true,
     "save_data_on": true,
     "ox": {
-        "valve_cvs": 0,
-        "injector_area": 0.00064373,
+        "valve_cvs": 0.9,
+        "injector_area": 1.5286468776033293e-05,
         "Cd_injector": 0.9,
         "V_tank": 8,
         "V_l": 2.6324,
@@ -29,8 +29,8 @@
         "active": false
     },
     "fuel": {
-        "valve_cvs": 0,
-        "injector_area": 8.6975e-06,
+        "valve_cvs": 0.9,
+        "injector_area": 7.5600681288380165e-06,
         "Cd_injector": 0.88,
         "V_tank": 4,
         "V_l": 1.893,
@@ -125,5 +125,5 @@
     "d_com_o": 2.191680013740442,
     "d_man_f": 9.558011942046667,
     "d_man_o": 13.680330723997272,
-    "case_name": "test_case_6"
+    "case_name": "test_case_maybe"
 }

@@ -150,8 +150,10 @@ fprintf(['Exit Mach number: %.2f\t\tMean oxidizer mdot: %.2f kg/s'...
 fprintf('Isp: %.2f s\t\tC*: %.1f m/s\t\tC_f: %.2f\n', ...
     record.Isp/g_0, record.c_star, record.c_f);
 % Save output data to a .mat file
-save(strcat(inputs.output_file, '.mat'), 'record');
-    
+if options.save_data_on
+    save(strcat(inputs.output_file, '.mat'), 'record');
+end
+
 %% Plot all data from record
 if options.output_on
     h_figure_1 = figure;

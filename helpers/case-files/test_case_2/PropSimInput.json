@@ -1,0 +1,133 @@
+{
+    "thrust": 3000,
+    "of_ratio": 4,
+    "P0": 3500000,
+    "altitude": 500,
+    "frozen": true,
+    "T_amb": 300,
+    "Lstar": 1.25,
+    "t_b": 3,
+    "plot_on": true,
+    "save_data_on": true,
+    "ox": {
+        "valve_cvs": [
+            0.9
+        ],
+        "injector_area": 1.5288773987545137e-05,
+        "Cd_injector": 0.9,
+        "V_tank": 6,
+        "V_l": 3.0,
+        "tank_id": 7,
+        "h_offset_tank": 2,
+        "d_flowline": 0.5,
+        "T_tank": 300
+    },
+    "ox_pressurant": {
+        "gas_properties": 0,
+        "set_pressure": 900,
+        "storage_initial_pressure": 950,
+        "tank_volume": 2,
+        "flow_CdA": 6.4e-05,
+        "active": true
+    },
+    "fuel": {
+        "valve_cvs": [
+            0.9
+        ],
+        "injector_area": 3.869782016397741e-06,
+        "Cd_injector": 0.88,
+        "V_tank": 4,
+        "V_l": 1.0,
+        "tank_id": 5,
+        "h_offset_tank": 2,
+        "d_flowline": 0.5,
+        "T_tank": 300
+    },
+    "fuel_pressurant": {
+        "gas_properties": 0,
+        "set_pressure": 550,
+        "storage_initial_pressure": 0,
+        "tank_volume": 0,
+        "flow_CdA": 6.4e-05,
+        "active": true
+    },
+    "dt_valve_open": 0.01,
+    "mass_dry_rocket": 30,
+    "length_cc": 0.15625,
+    "d_cc": 0.07636190340396029,
+    "nozzle_efficiency": 0.95,
+    "nozzle_correction_factor": 0.983,
+    "c_star_efficiency": 0.85,
+    "d_throat": 0.026998009860626213,
+    "exp_ratio": 5.325548743690573,
+    "rho_o": 772.75,
+    "rho_f": 789,
+    "delta_p": 25.0,
+    "min_d_o": 3.0,
+    "min_d_f": 1.0,
+    "mode": {
+        "combustion_on": true,
+        "flight_on": false
+    },
+    "options": {
+        "t_final": 60,
+        "dt": 0.01,
+        "output_on": true
+    },
+    "test_data": {
+        "test_plots_on": false,
+        "test_data_file": "5_13_18_data.mat",
+        "t_offset": 0
+    },
+    "propsim_io": {
+        "input_file": "PropSimInput",
+        "output_file": "PropSimOutput"
+    },
+    "imp_angle": 60,
+    "M_coeff": 1.6,
+    "jet_LD": 6,
+    "orifice_LD": 7,
+    "P3": 95540.85551916901,
+    "P1": 1951800.0,
+    "T0": 3083.72,
+    "M": 24.977,
+    "gamma": 1.2317,
+    "cstar_max": 1546.9,
+    "isp_max": 236.30972960915332,
+    "v2": 2317.3831788986427,
+    "x_mdot": 1.2945636385544912,
+    "x_mdot_f": 0.25891272771089824,
+    "x_mdot_ox": 1.035650910843593,
+    "nozzle": {
+        "ER": 5.325548743690573,
+        "Tt": 2763.5614105838595,
+        "Te": 1566.345039815748,
+        "Mnum": 2.8917098837177613,
+        "At": 0.0005724708594297406,
+        "Rt": 0.013499004930313106,
+        "Ae": 0.0030487214662355175,
+        "Re": 0.031151856813414945,
+        "Ac": 0.004579766875437925,
+        "Rc": 0.038180951701980145,
+        "Lc": 0.15625,
+        "Ldn": 0.065881340126224,
+        "Lcn": 0.024681946771667043
+    },
+    "x_mdot_o": 1.035650910843593,
+    "n_o": 132.0,
+    "n_f": 4.0,
+    "d_o": 0.5493944516102149,
+    "d_f": 1.5875655444428982,
+    "a_o": 7.068583470577034e-06,
+    "a_f": 7.853981633974482e-07,
+    "L_jet_o": 3.2963667096612896,
+    "L_jet_f": 9.525393266657389,
+    "L_poi_o": 2.854737310756,
+    "L_poi_f": 8.249232549962539,
+    "L_inj": 9.624104641622964,
+    "d_com_f": 9.525393266657387,
+    "d_com_o": 3.296366709661289,
+    "d_man_f": 14.409325520761577,
+    "d_man_o": 20.638352077757673,
+    "case_name": "test_case_2"
+}
