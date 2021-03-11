@@ -38,6 +38,8 @@ OUTPUTS:
 
 import numpy as np
 import os
+import sys
+from helpers.misc import print_header
 
 
 def injector_main(data: dict) -> dict:
@@ -85,6 +87,12 @@ def injector_main(data: dict) -> dict:
     # Want to round down (np.floor()) so that the minimum diameter isn't exceeded
     n_o = np.floor(n_o) if np.floor(n_o) % 2 == 0 else np.floor(n_o) - 1
     n_f = np.floor(n_f) if np.floor(n_f) % 2 == 0 else np.floor(n_f) - 1
+    if n_f <= 0:
+        print_header("The given fuel injector area is too small (minimum orifice diameter exceeded).")
+        sys.exit(0)
+    if n_o <= 0:
+        print_header("The given oxidizer injector area is too small (minimum orifice diameter exceeded).")
+        sys.exit(0)
     # Diameter of a single orifice (this is different from d_o after a set n_o is chosen) [mm]
     d_o = 2 * np.sqrt(mdot_o/(Cd_o * n_o * np.pi * np.sqrt(2 * rho_o * P0 * delta_p/100))) * 1000
     d_f = 2 * np.sqrt(mdot_f/(Cd_f * n_f * np.pi * np.sqrt(2 * rho_f * P0 * delta_p/100))) * 1000
@@ -103,6 +111,7 @@ def injector_main(data: dict) -> dict:
     d_man_f = (d_com_o/L_poi_o) * (L_inj + L_poi_o)
     d_man_o = (d_com_f/L_poi_f) * (L_inj + L_poi_f)
 
+    A_inj_total_o, A_inj_total_f = get_eff_A_inj(data)
     data["ox"]["injector_area"] = A_inj_total_o
     data["fuel"]["injector_area"] = A_inj_total_f
     data["x_mdot_o"] = mdot_o
@@ -132,47 +141,45 @@ def injector_main(data: dict) -> dict:
     return data
 
 
-def total_cv(valve_cvs: list or np.ndarray or float) -> float:
-    """ Returns the total flow coefficient (Cv) given several Cv values. """
-    if type(valve_cvs) == float and valve_cvs != 0:
-        return valve_cvs
-    elif (type(valve_cvs) == float and valve_cvs == 0) or len(valve_cvs) == 0:
-        return 0
+def get_eff_A_inj(data: dict, A_inj: float) -> tuple:
+    """ 
+    Finds effective injector area. Combines injector area with flow coefficient (Cv) values. 
+    Finding the effective CdA throughout the system involves the following steps:
+        - Find total flow coefficient (Cv)
+        - Convert Cv into CdA; CdA = Cv/sqrt(2/rho_H2O)
+            - Cv is in [gallons/min]/sqrt([psi]), need to convert metric
+            - i.e. convert GPM to m^3/s and psi^-0.5 to Pa^-0.5
+            - Conversion factor of equation's right-hand-side: 7.59805e-07
+            - (Try: 1 gpm/(1 psi)^0.5*sqrt(1 kg/m^3) in WolframAlpha)
+            - So, 7.59805e-07*Cv/sqrt(2/rho_H2O) = CdA [m^2]
+        - Combine valve's CdA with injector CdA to find effective CdA 
+    """
+    cv_eff_ox = total_cv(data["ox"]["valve_cvs"]) # Effective total Cv of fuel valves
+    cv_eff_fuel = total_cv(data["fuel"]["valve_cvs"]) # Effective total Cv of oxidizer valves
+    if cv_eff_ox == 0: # User input indicated no propellant valves; simply use A_inj
+        A_inj_ox = data["ox"]["injector_area"]
     else:
-        temp_sum = 0
-        for i in range(len(valve_cvs)):
-            temp_sum += 1/(valve_cvs[i]**2)
-        cv = np.sqrt(temp_sum**-1)
-        return cv
-
-
-"""
-# Mass flow rate of a single orifice
-mdot_o_orifice = Cd_o * (np.pi * ((d_o/2) * 0.001)**2) * np.sqrt(2 * rho_o * P0 * delta_p/100)
-mdot_f_orifice = Cd_f * (np.pi * ((d_f/2) * 0.001)**2) * np.sqrt(2 * rho_f * P0 * delta_p/100)
-# Number of orifices
-n_o = mdot_o / mdot_o_orifice
-n_f = mdot_f / mdot_f_orifice
-n_o = round(n_o) if round(n_o) % 2 == 0 else round(n_o) + 1
-n_f = round(n_f) if round(n_f) % 2 == 0 else round(n_f) + 1
-# Diameter of orifice
-d_o = 2 * np.sqrt(mdot_o/(Cd_o * n_o * np.pi * np.sqrt(2 * rho_o * P0 * delta_p/100))) * 1000 
-d_f = 2 * np.sqrt(mdot_f/(Cd_f * n_f * np.pi * np.sqrt(2 * rho_f * P0 * delta_p/100))) * 1000
-# Area of orifices
-a_o = np.pi * (d_o/2)**2 
-a_f = np.pi * (d_f/2)**2
-# Length of fluid jets
-L_jet_o = jet_LD * d_o
-L_jet_f = jet_LD * d_f
-# Point of impingment
-L_poi_o = L_jet_o * np.cos(np.deg2rad(imp_angle/2))
-L_poi_f = L_jet_f * np.cos(np.deg2rad(imp_angle/2))
-# Length (thickness) of injector
-L_inj = orifice_LD * max(d_o, d_f) * np.cos(np.deg2rad(imp_angle / 2))
-# Distance between orifice (in an element pair) on combustion chamber side
-d_com_f = 2 * L_jet_f * np.sin(np.deg2rad(imp_angle / 2)) 
-d_com_o = 2 * L_jet_o * np.sin(np.deg2rad(imp_angle / 2))
-# Distance between orifice (in a pair) on injector side
-d_man_f = (d_com_o/L_poi_o) * (L_inj + L_poi_o)
-d_man_o = (d_com_f/L_poi_f) * (L_inj + L_poi_f) 
-"""
+        A_mpv_ox = cv_eff_ox*7.59805e-07/np.sqrt(2/1000) # % 1000 kg/m^3, density of water
+        A_inj_ox = 1/np.sqrt((1/(A_mpv_ox**2))+(1/(data["ox"]["injector_area"]**2))) # in [m^2]
+    if cv_eff_fuel == 0: # User input indicated no propellant valves; simply use A_inj
+        A_inj_fuel = data["fuel"]["injector_area"]
+    else:
+        A_mpv_fuel = cv_eff_fuel*7.59805e-07/np.sqrt(2/1000) # % 1000 kg/m^3, density of water
+        A_inj_fuel = 1/np.sqrt((1/(A_mpv_fuel**2))+(1/(data["fuel"]["injector_area"]**2))) # in [m^2]
+    return A_inj_ox, A_inj_fuel
+    
+    
+def total_cv(valve_cvs: list or np.ndarray or float or np.float64) -> float:
+    if type(valve_cvs) in {float, np.float64} and valve_cvs != 0:
+        return valve_cvs
+    elif valve_cvs <= 0:
+        return 0
+    elif type(valve_cvs) in {list, np.ndarray}:
+        if len(valve_cvs) > 0:
+            temp_sum = 0
+            for i in range(len(valve_cvs)):
+                temp_sum += 1/(valve_cvs[i]**2)
+            cv = np.sqrt(temp_sum**-1)
+            return cv
+        return 0
+    else: return 0

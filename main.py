@@ -56,10 +56,9 @@ def main(cmd_args: list) -> Tuple[dict, float, str]:
             if not check_valid_input(data, {np.float64, float, int, bool, type(None), str}):
                 print_header("Invalid configuration file (some data types not allowed). Try again.")
                 sys.exit(0)
-        except IOError or ValueError or AssertionError:
+        except (IOError, ValueError, AssertionError):
             print_header("Invalid file path. Please ensure the file path is typed correctly.")
             if contains_cmd_args: sys.exit(0)
-    input_path = temp_path
     # Get ambient pressure given the input altitude
     data["P3"] = get_exit_pressure(data["altitude"])
     # Add precision to data type
@@ -84,7 +83,7 @@ def main(cmd_args: list) -> Tuple[dict, float, str]:
     # Run PropSim (liquid engine performance simulator)
     output_file_path = propsim_main(data, case_dir)
     # Compile output data into a summary
-    design_dict, summary_path = compile_outputs(data, output_file_path)
+    design_dict, _ = compile_outputs(data, output_file_path)
     # Print calculation outputs
     for key, val in design_dict.items():
         print(f"{key} = {val}")

@@ -21,8 +21,10 @@ def compile_outputs(data: dict, output_file_path: str) -> tuple:
     # Mass of propellants
     Mox_initial = record["m_ox"].flatten()[0]
     Mox = record["m_ox"].flatten()[0] - record["m_ox"].flatten()[-1]
+    Vox = (Mox/data["rho_o"])*1e03 # [L]
     Mfuel_initial = record["m_fuel"].flatten()[0]
     Mfuel = record["m_fuel"].flatten()[0] - record["m_fuel"].flatten()[-1]
+    Vfuel = (Mfuel/data["rho_f"])*1e03 # [L]
     of_ratio = Mox/Mfuel
     avg_mdot_ox = np.mean(record["m_dot_ox"].flatten()[1:]) # First element is None
     avg_mdot_fuel = np.mean(record["m_dot_fuel"].flatten()[1:]) # First element is None
@@ -42,9 +44,11 @@ def compile_outputs(data: dict, output_file_path: str) -> tuple:
     design["impulse"]          = impulse
     design["isp"]              = isp
     design["Mox_initial"]      = Mox_initial
-    design["Mox"]              = Mox
+    design["Mox_used"]         = Mox
+    design["Vox_used"]         = Vox
     design["Mfuel_initial"]    = Mfuel_initial
-    design["Mfuel"]            = Mfuel
+    design["Mfuel_used"]       = Mfuel
+    design["Vfuel_used"]       = Vfuel
     design["of_ratio"]         = of_ratio
     design["avg_mdot_ox"]      = avg_mdot_ox
     design["avg_mdot_fuel"]    = avg_mdot_fuel
@@ -56,6 +60,9 @@ def compile_outputs(data: dict, output_file_path: str) -> tuple:
     design["A_inj_fuel"]       = data["fuel"]["injector_area"]
     design["exit_mach"]        = exit_mach
     design["burn_time"]        = burn_time
+    # Cut off extraneous significant figures
+    for key, val in design.items():
+        design[key] = np.round(val, decimals=4) if val > 0.1 else val
     # Export to JSON file
     json_obj = json.dumps(design, indent=4, separators=(",", ": "))
     prefix = output_file_path[:output_file_path.rfind("/")]

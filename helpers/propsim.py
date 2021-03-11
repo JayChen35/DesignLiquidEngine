@@ -39,9 +39,9 @@ def propsim_main(data: dict, case_dir: str) -> str:
     shutil.copyfile(json_path, json_temp_path)
     # Call the compiled MATLAB executable to run PropSim
     if platform.system() == "Windows":
-        subprocess.call(f"PropSimIntegrated.exe {json_temp_path}")
+        subprocess.call(f"./PropSimIntegrated.exe {json_temp_path}")
     elif platform.system() in ["Linux", "Darwin", "Java"]:
-        raise NotImplementedError
+        subprocess.call(f"./run_PropSimIntegrated.sh $MCR_PATH/v99 {json_temp_path}")
     # Delete the temporary JSON file and move output .mat file from PropSim to case-files
     os.remove(json_temp_path)
     output_file_path = case_dir + f"/{output_file_name}.mat"
