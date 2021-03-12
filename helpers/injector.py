@@ -112,8 +112,10 @@ def injector_main(data: dict) -> dict:
     d_man_o = (d_com_f/L_poi_f) * (L_inj + L_poi_f)
 
     A_inj_total_o, A_inj_total_f = get_eff_A_inj(data)
-    data["ox"]["injector_area"] = A_inj_total_o
-    data["fuel"]["injector_area"] = A_inj_total_f
+    data["ox"]["A_inj_o_only"] = data["ox"]["injector_area"] # Only the oxidizer injector area
+    data["ox"]["A_inj_f_only"] = data["fuel"]["injector_area"] # Only the fuel injector area
+    data["ox"]["injector_area"] = A_inj_total_o # Effective oxidizer injector area (including Cv)
+    data["fuel"]["injector_area"] = A_inj_total_f # Effective fuel injector area (including Cv)
     data["x_mdot_o"] = mdot_o
     data["x_mdot_f"] = mdot_f
     data["n_o"] = n_o
@@ -154,8 +156,10 @@ def get_eff_A_inj(data: dict) -> tuple:
             - So, 7.59805e-07*Cv/sqrt(2/rho_H2O) = CdA [m^2]
         - Combine valve's CdA with injector CdA to find effective CdA 
     """
-    cv_eff_ox = total_cv(data["ox"]["valve_cvs"]) # Effective total Cv of fuel valves
-    cv_eff_fuel = total_cv(data["fuel"]["valve_cvs"]) # Effective total Cv of oxidizer valves
+    # Effective total Cv of fuel valves
+    cv_eff_ox = total_cv(data["ox"]["valve_cvs"], data["ox"]["cv_type"]) 
+    # Effective total Cv of oxidizer valves
+    cv_eff_fuel = total_cv(data["fuel"]["valve_cvs"], data["fuel"]["cv_type"])
     if cv_eff_ox == 0: # User input indicated no propellant valves; simply use A_inj
         A_inj_ox = data["ox"]["injector_area"]
     else:
@@ -169,17 +173,20 @@ def get_eff_A_inj(data: dict) -> tuple:
     return A_inj_ox, A_inj_fuel
     
     
-def total_cv(valve_cvs: list or np.ndarray or float or np.float64) -> float:
-    if type(valve_cvs) in {float, np.float64} and valve_cvs > 0:
+def total_cv(valve_cvs, arg: int) -> float:
+    if type(valve_cvs) in {float, np.float64, np.float32, int} and valve_cvs > 0:
         return valve_cvs
-    elif type(valve_cvs) in {float, np.float64} and valve_cvs <= 0:
+    elif type(valve_cvs) in {float, np.float64, np.float32, int} and valve_cvs <= 0:
         return 0
-    elif type(valve_cvs) in {list, np.ndarray}:
-        if len(valve_cvs) > 0:
+    if arg == 0: # Valves are arranged in series
+        if type(valve_cvs) in {list, np.ndarray} and len(valve_cvs) > 0:
             temp_sum = 0
             for i in range(len(valve_cvs)):
-                temp_sum += 1/(valve_cvs[i]**2)
+                temp_sum += 1/(valve_cvs[i]**2) # Sum of inverse squares
             cv = np.sqrt(temp_sum**-1)
             return cv
         return 0
-    else: return 0
+    else: # Valves are arranged in parallel
+        if type(valve_cvs) in {list, np.ndarray} and len(valve_cvs) > 0:
+            return np.sum(valve_cvs) # Simply add all Cv values if in parallel
+        return 0

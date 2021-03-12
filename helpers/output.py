@@ -36,6 +36,10 @@ def compile_outputs(data: dict, output_file_path: str) -> tuple:
     # Other parameters
     exit_mach = np.mean(record["M_e"].flatten())
     burn_time = record["time"].flatten()[-1]
+    wet_mass = data["mass_dry_rocket"] + Mfuel_initial + Mox_initial
+    dry_mass = data["mass_dry_rocket"] + (Mfuel_initial-Mfuel) + (Mox_initial-Mox)
+    delta_v = isp*g_0*np.log(wet_mass/dry_mass) # 343 m/s is speed of sound at sea level
+    ideal_alt = 0.5*(delta_v**2)/g_0 # Simply using delta_K = delta_U; no air resistance
     # Add vital data to output dictionary
     # TODO: ADD MORE CRITICAL VALUES HERE; add values from data_dict to here
     design["max_thrust"]       = max_thrust
@@ -56,10 +60,14 @@ def compile_outputs(data: dict, output_file_path: str) -> tuple:
     design["end_p_oxtank"]     = end_p_oxtank
     design["start_p_fueltank"] = start_p_fueltank
     design["end_p_fueltank"]   = end_p_fueltank
-    design["A_inj_ox"]         = data["ox"]["injector_area"]
-    design["A_inj_fuel"]       = data["fuel"]["injector_area"]
+    design["A_inj_ox_eff"]     = data["ox"]["injector_area"] # Only the injector area (orifice sizes)
+    design["A_inj_fuel_eff"]   = data["fuel"]["injector_area"]
+    design["A_inj_o_only"]     = data["ox"]["A_inj_o_only"] # Effective injector area (including Cv)
+    design["A_inj_f_only"]     = data["ox"]["A_inj_f_only"]
     design["exit_mach"]        = exit_mach
     design["burn_time"]        = burn_time
+    design["ideal_delta_v"]    = delta_v
+    design["ideal_alt"]        = ideal_alt
     # Cut off extraneous significant figures
     for key, val in design.items():
         design[key] = np.round(val, 4) if val > 0.1 else round(val, 5-int(np.floor(np.log10(abs(val))))-1)

@@ -22,5 +22,7 @@
     "A_inj_o_only": 0.05,
     "A_inj_f_only": 2e-06,
     "exit_mach": 2.0751,
-    "burn_time": 10.5691
+    "burn_time": 10.5691,
+    "ideal_delta_v": 128.0221,
+    "ideal_alt": 835.6395
 }

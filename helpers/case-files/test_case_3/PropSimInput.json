@@ -10,7 +10,6 @@
     "plot_on": true,
     "save_data_on": true,
     "ox": {
-        "cv_type": 1,
         "valve_cvs": [
             0.9
         ],
@@ -34,7 +33,6 @@
         "active": true
     },
     "fuel": {
-        "cv_type": 1,
         "valve_cvs": [
             0.9
         ],
@@ -133,5 +131,5 @@
     "d_com_o": 0.47200102647211023,
     "d_man_f": 16.943619962991942,
     "d_man_o": 30.59014945353683,
-    "case_name": "test_case_2"
+    "case_name": "test_case_3"
 }
