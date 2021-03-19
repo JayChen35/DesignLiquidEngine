@@ -1,4 +1,4 @@
-# Compiling utput data from PropSimEX2
+# Compiling output data from PropSimEX2
 # Authors: Jason Chen
 # Project Caelus, Aphlex 1C Engine
 # Current revision: 05 March, 2021
@@ -39,7 +39,8 @@ def compile_outputs(data: dict, output_file_path: str) -> tuple:
     burn_time = record["time"].flatten()[-1]
     wet_mass = data["mass_dry_rocket"] + Mfuel_initial + Mox_initial
     dry_mass = data["mass_dry_rocket"] + (Mfuel_initial-Mfuel) + (Mox_initial-Mox)
-    delta_v = exit_mach*local_c*np.log(wet_mass/dry_mass)
+    delta_v = isp*g_0*np.log(wet_mass/dry_mass)
+    # delta_v = exit_mach*local_c*np.log(wet_mass/dry_mass)
     ideal_alt = 0.5*(delta_v**2)/g_0 # Simply using delta_K = delta_U; no air resistance
     # Add vital data to output dictionary
     # TODO: ADD MORE CRITICAL VALUES HERE; add values from data_dict to here

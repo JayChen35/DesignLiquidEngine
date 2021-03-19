@@ -8,7 +8,7 @@ INPUTS:
     - of_ratio = Oxidizer to fuel ratio, dimensionless
     - rho_f = Fuel density, kg/m^3
     - rho_o = Oxidizer density, kg/m^3
-    - P0, Chamber pressure, Pa
+    - P_0, Chamber pressure, Pa
     - delta_p = Pressure drop across injector, % (of chamber pressure)
     - d_o = Starting diameter of oxidizer orifice, mm (1.58)
     - d_f = Starting diameter of fuel orifice, mm (1.00)
@@ -44,14 +44,14 @@ from helpers.misc import print_header
 
 def injector_main(data: dict) -> dict:
     """ Calculates injector parameters. """
-
-    mdot = data["x_mdot"]
+    # Process CEA parameters
+    mdot = data["x_mdot"] # [kg/s] Target total mass flow rate
+    mdot_o = data["x_mdot_o"] # [kg/s] Target oxidizer mass flow rate
+    mdot_f = data["x_mdot_f"] # [kg/s] Target fuel mass flow rate
     of_ratio = data["of_ratio"]
-    mdot_o = mdot * of_ratio/(of_ratio+1)
-    mdot_f = mdot * 1/(of_ratio+1)
     rho_f = data["rho_f"]
     rho_o = data["rho_o"]
-    P0 = data["P0"]
+    P_0 = data["P_0"]
     delta_p = data["delta_p"]
     d_o = data["min_d_o"]
     d_f = data["min_d_f"]
@@ -71,8 +71,8 @@ def injector_main(data: dict) -> dict:
 
     if data["ox"]["injector_area"] is None or data["fuel"]["injector_area"] is None:
         # Total injector area
-        A_inj_total_o = mdot_o/(Cd_o * np.sqrt(2*rho_o*P0*(delta_p/100))) 
-        A_inj_total_f = mdot_f/(Cd_f * np.sqrt(2*rho_f*P0*(delta_p/100)))
+        A_inj_total_o = mdot_o/(Cd_o * np.sqrt(2*rho_o*P_0*(delta_p/100))) 
+        A_inj_total_f = mdot_f/(Cd_f * np.sqrt(2*rho_f*P_0*(delta_p/100)))
 
     else: # Both injector areas are driving parameters
         A_inj_total_o = data["ox"]["injector_area"]
@@ -94,8 +94,8 @@ def injector_main(data: dict) -> dict:
         print_header("The given oxidizer injector area is too small (minimum orifice diameter exceeded).")
         sys.exit(0)
     # Diameter of a single orifice (this is different from d_o after a set n_o is chosen) [mm]
-    d_o = 2 * np.sqrt(mdot_o/(Cd_o * n_o * np.pi * np.sqrt(2 * rho_o * P0 * delta_p/100))) * 1000
-    d_f = 2 * np.sqrt(mdot_f/(Cd_f * n_f * np.pi * np.sqrt(2 * rho_f * P0 * delta_p/100))) * 1000
+    d_o = 2 * np.sqrt(mdot_o/(Cd_o * n_o * np.pi * np.sqrt(2 * rho_o * P_0 * delta_p/100))) * 1000
+    d_f = 2 * np.sqrt(mdot_f/(Cd_f * n_f * np.pi * np.sqrt(2 * rho_f * P_0 * delta_p/100))) * 1000
     # Length of fluid jets [mm]
     L_jet_o = jet_LD * d_o
     L_jet_f = jet_LD * d_f
@@ -116,8 +116,7 @@ def injector_main(data: dict) -> dict:
     data["ox"]["A_inj_f_only"] = data["fuel"]["injector_area"] # Only the fuel injector area
     data["ox"]["injector_area"] = A_inj_total_o # Effective oxidizer injector area (including Cv)
     data["fuel"]["injector_area"] = A_inj_total_f # Effective fuel injector area (including Cv)
-    data["x_mdot_o"] = mdot_o
-    data["x_mdot_f"] = mdot_f
+    data["thrust"] = data["x_thrust"] # For now, assume target thrust is the actual thrust
     data["n_o"] = n_o
     data["n_f"] = n_f
     data["d_o"] = d_o
@@ -134,11 +133,11 @@ def injector_main(data: dict) -> dict:
     data["d_man_f"] = d_man_f
     data["d_man_o"] = d_man_o
 
-    # Tank volumes = target_mdot * burn_time
-    if data["ox"]["V_l"] is None: 
-        data["ox"]["V_l"] = data["x_mdot_o"]*data["t_b"]
+    # Fill remaining parameters
+    if data["ox"]["V_l"] is None: # Is this the same as using data["prop_mass"]?
+        data["ox"]["V_l"] = mdot_o*data["x_burn_time"]
     if data["fuel"]["V_l"] is None:
-        data["fuel"]["V_l"] = data["x_mdot_f"]*data["t_b"]
+        data["fuel"]["V_l"] = mdot_f*data["x_burn_time"]
     
     return data
 

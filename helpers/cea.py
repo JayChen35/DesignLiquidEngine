@@ -21,7 +21,7 @@ from helpers.misc import print_header
 def cea_inp(data: dict, case_name: str) -> str:
     """ Creates CEA .inp input file given a case_name. Returns path to case directory."""
     case_dir = f"./case-files/{case_name}"
-    pressure_ratio = round(data["P0"]/data["P3"], 3)
+    pressure_ratio = round(data["P_0"]/data["P_3"], 3)
     # Frozen tends to overestimate engine performance, equilibrium tends to underestimate
     frozen = "frozen nfz=1" if bool(data["frozen"]) else "equilibrium" # Freezing point at throat
     # Make case folder and input file
@@ -34,7 +34,7 @@ def cea_inp(data: dict, case_name: str) -> str:
         f.write(line_1)
         line_2 = f"      rocket  {frozen}\n"
         f.write(line_2)
-        line_3 = f"  p,bar={data['P0']/1e05},\n" # Pascal to Bar conversion
+        line_3 = f"  p,bar={data['P_0']/1e05},\n" # Pascal to Bar conversion
         f.write(line_3)
         line_4 = f"  pi/p={pressure_ratio},\n"
         f.write(line_4)
@@ -103,11 +103,11 @@ def cea_outparse(data: dict, case_name: str, case_dir: str) -> dict:
                     temp = line.split()
                     row.append(temp[2])
                     row.append(temp[3])
-                    data["P1"] = float(temp[3])*1e05 # Nozzle (critical) pressure [Pa]
+                    data["p_1"] = float(temp[3])*1e05 # Nozzle (critical) pressure [Pa]
                 if "T, K" in line:
                     temp = line.split()
                     row.append(temp[2])
-                    data["T0"] = float(temp[2]) # Combustion chamber temperature [K]
+                    data["T_0"] = float(temp[2]) # Combustion chamber temperature [K]
                 if "M, (1/n)" in line:
                     temp = line.split()
                     row.append(temp[2])
@@ -119,11 +119,11 @@ def cea_outparse(data: dict, case_name: str, case_dir: str) -> dict:
                 if "CSTAR, M/SEC" in line:
                     temp = line.split()
                     row.append(temp[2])
-                    data["cstar_max"] = float(temp[2]) # Maximum (theoretical) C* [m/s]
+                    data["cstar_cea"] = float(temp[2]) # Maximum (theoretical) C* [m/s]
                 if "Isp, M/SEC" in line:
                     temp = line.split()
                     row.append(temp[2])
-                    data["isp_max"] = float(temp[2]) # Maximum (theoretical) specific impulse [m/s]
+                    data["v_2_cea"] = float(temp[2]) # Maximum (theoretical) exhaust velocity [m/s]
             file_writer.writerow(row)
     print(f"CEA output parsing complete. {case_name}.csv saved to {case_dir}.")
     return data
