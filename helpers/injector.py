@@ -93,9 +93,21 @@ def injector_main(data: dict) -> dict:
     if n_o <= 0:
         print_header("The given oxidizer injector area is too small (minimum orifice diameter exceeded).")
         sys.exit(0)
+    # Check to see if maximum number of orifices is exceeded
+    if n_o > data["max_n_o"]:
+        n_o = data["max_n_o"]
+    if n_f > data["max_n_f"]:
+        n_f = data["max_n_f"]
     # Diameter of a single orifice (this is different from d_o after a set n_o is chosen) [mm]
-    d_o = 2 * np.sqrt(mdot_o/(Cd_o * n_o * np.pi * np.sqrt(2 * rho_o * P_0 * delta_p/100))) * 1000
-    d_f = 2 * np.sqrt(mdot_f/(Cd_f * n_f * np.pi * np.sqrt(2 * rho_f * P_0 * delta_p/100))) * 1000
+    d_o = 2 * np.sqrt((A_inj_total_o/n_o)/np.pi) * 1e03
+    d_f = 2 * np.sqrt((A_inj_total_f/n_f)/np.pi) * 1e03
+    # Catch invalid inputs (if it is physically impossible to meet both orifice constraints)
+    if d_o < data["min_d_o"]:
+        print_header("The oxidizer minimum orifice diameter/maximum number of orifices is overconstrained.")
+        sys.exit(0)
+    if d_f < data["min_d_f"]:
+        print_header("The fuel minimum orifice diameter/maximum number of orifices is overconstrained.")
+        sys.exit(0)
     # Length of fluid jets [mm]
     L_jet_o = jet_LD * d_o
     L_jet_f = jet_LD * d_f
@@ -121,8 +133,6 @@ def injector_main(data: dict) -> dict:
     data["n_f"] = n_f
     data["d_o"] = d_o
     data["d_f"] = d_f
-    data["a_o"] = a_o
-    data["a_f"] = a_f
     data["L_jet_o"] = L_jet_o
     data["L_jet_f"] = L_jet_f
     data["L_poi_o"] = L_poi_o

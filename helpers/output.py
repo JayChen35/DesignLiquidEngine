@@ -49,6 +49,7 @@ def compile_outputs(data: dict, output_file_path: str) -> tuple:
     design["p_cc_max"]         = p_cc_max
     design["impulse"]          = impulse
     design["isp"]              = isp
+    design["Mprop_used"]       = Mox + Mfuel
     design["Mox_initial"]      = Mox_initial
     design["Mox_used"]         = Mox
     design["Vox_used"]         = Vox

@@ -32,7 +32,8 @@ ox: # Oxidizer (nitrous oxide) properties
     - 0.9 # Leave array empty/as zero if no propellant valves
     - 0.9
     - 0.9
-  injector_area : 4.0e-04 # [m^2] [null] Total injector orifice area
+    - 0.9
+  injector_area : 8.0e-04 # [m^2] [null] Total injector orifice area
   Cd_injector   : 0.9     # [~] Dischrge coefficient (of injector orifices)
   V_tank        : 8       # [L] Propellant tank volume (around 60 cubic feet)
   # V_l           : null    # [L] [null] Liquid nitrous volume 
@@ -40,7 +41,7 @@ ox: # Oxidizer (nitrous oxide) properties
   tank_id       : 7       # [in] Tank inner diameter
   h_offset_tank : 2       # [in] Distance from bottom of tank to injector
   d_flowline    : 0.5     # [in] Main flow line diameter
-  T_tank        : 300     # [K] Tank temperature
+  T_tank        : 302     # [K] Tank temperature
 ox_pressurant: # Properties for the gaseous oxidizer pressurant (nitrous)
   gas_properties : 0 # 0 = nitrogen, 1 = helium (more inert gases will be added later)
   set_pressure : 950 # [psi] Set regulator pressure between COPV and propellant tank
@@ -53,7 +54,7 @@ fuel: # Fuel (95% ethyl alcohol) properties
   cv_type: 0 # Arrangement of valves; 0 = series, 1 = parallel
   valve_cvs: # Leave array empty/as zero if no propellant valves
     - 0.9
-  injector_area : 3.2e-06 # [m^2] [null] Total injector orifice area
+  injector_area : 5.0e-06 # [m^2] [null] Total injector orifice area
   Cd_injector   : 0.88    # [~] Dischrge coefficient (of injector orifices)
   V_tank        : 4       # [L] Propellant tank volume (around 30 cubic feet)
   # V_l           : null    # [L] [null] Liquid nitrous volume
