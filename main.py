@@ -62,9 +62,6 @@ def main(cmd_args: list) -> Tuple[dict, float, str]:
             if contains_cmd_args: sys.exit(0)
     # Get ambient pressure given the input altitude
     data["P_3"] = get_exit_pressure(data["altitude"])
-    # Add precision to data type
-    data["ox"]["injector_area"] = np.float64(data["ox"]["injector_area"])
-    data["fuel"]["injector_area"] = np.float64(data["fuel"]["injector_area"])
     # Get desired name of output/case files from user
     if not contains_cmd_args:
         temp_name = input("Enter the desired name of output/case files (press [ENTER] to use default): ")

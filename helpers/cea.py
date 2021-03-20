@@ -55,6 +55,7 @@ def cea_inp(data: dict, case_name: str) -> str:
 
 def driver_cea(case_name: str, case_dir: str):
     """ Driver for running the CEA executable. """
+    # TODO: Find a better way to do this other than pyautogui
     cea_exe_dir = "./CEAexec/cea-exec/"
     # Move .inp file to same directory as FCEA2m.exe
     shutil.move(f"{case_dir}/{case_name}.inp", f"./CEAexec/cea-exec/{case_name}.inp")
