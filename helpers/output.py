@@ -1,4 +1,4 @@
-# Compiling utput data from PropSimEX2
+# Compiling output data from PropSimEX2
 # Authors: Jason Chen
 # Project Caelus, Aphlex 1C Engine
 # Current revision: 05 March, 2021
@@ -34,11 +34,13 @@ def compile_outputs(data: dict, output_file_path: str) -> tuple:
     start_p_fueltank = record["p_fueltank"].flatten()[0]
     end_p_fueltank = record["p_fueltank"].flatten()[-1]
     # Other parameters
-    exit_mach = np.mean(record["M_e"].flatten())
+    exit_mach = get_filtered_max(record, record["M_e"].flatten())
+    local_c = np.sqrt(1.4*287.058*data["T_amb"]) # Local speed of sound, 1.4 gamma, 287.058 J/kg*K
     burn_time = record["time"].flatten()[-1]
     wet_mass = data["mass_dry_rocket"] + Mfuel_initial + Mox_initial
     dry_mass = data["mass_dry_rocket"] + (Mfuel_initial-Mfuel) + (Mox_initial-Mox)
-    delta_v = isp*g_0*np.log(wet_mass/dry_mass) # 343 m/s is speed of sound at sea level
+    delta_v = isp*g_0*np.log(wet_mass/dry_mass)
+    # delta_v = exit_mach*local_c*np.log(wet_mass/dry_mass)
     ideal_alt = 0.5*(delta_v**2)/g_0 # Simply using delta_K = delta_U; no air resistance
     # Add vital data to output dictionary
     # TODO: ADD MORE CRITICAL VALUES HERE; add values from data_dict to here
@@ -47,6 +49,7 @@ def compile_outputs(data: dict, output_file_path: str) -> tuple:
     design["p_cc_max"]         = p_cc_max
     design["impulse"]          = impulse
     design["isp"]              = isp
+    design["Mprop_used"]       = Mox + Mfuel
     design["Mox_initial"]      = Mox_initial
     design["Mox_used"]         = Mox
     design["Vox_used"]         = Vox
@@ -80,8 +83,9 @@ def compile_outputs(data: dict, output_file_path: str) -> tuple:
     return design, json_path
 
 
-def get_max_thrust(record: dict, dt_filter: float = 0.1) -> tuple:
+def get_max_thrust(record: dict) -> tuple:
     """ Filters out local spikes and finds max thrust, mdot, and chamber pressure. """
+    dt_filter = 0.1
     dn_thrust_filter = np.ceil(dt_filter/np.mean(np.diff(record["time"])))
     a = np.array([1])
     b = (1/dn_thrust_filter * np.ones((int(dn_thrust_filter), 1))).flatten()
@@ -93,6 +97,16 @@ def get_max_thrust(record: dict, dt_filter: float = 0.1) -> tuple:
     m_dot_max = filtered_m_dot[max_ind]
     p_cc_max = filtered_p_cc[max_ind]
     return max_thrust, m_dot_max, p_cc_max
+
+
+def get_filtered_max(record: dict, vals: list or np.ndarray) -> float:
+    dt_filter = 0.1
+    dn_filter = np.ceil(dt_filter/np.mean(np.diff(record["time"])))
+    a = np.array([1])
+    b = (1/dn_filter * np.ones((int(dn_filter), 1))).flatten()
+    filtered_val = scipy.signal.lfilter(b, a, vals)
+    max_ind = np.argmax(filtered_val)
+    return filtered_val[max_ind]
 
 
 if __name__ == "__main__":

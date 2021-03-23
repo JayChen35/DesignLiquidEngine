@@ -58,7 +58,7 @@
     },
     "fuel_pressurant": {
         "gas_properties": 0,
-        "set_pressure": 900,
+        "set_pressure": 850,
         "storage_initial_pressure": 0,
         "tank_volume": 0,
         "flow_CdA": 6.4e-05,
@@ -143,5 +143,5 @@
     "d_com_o": 1.3130091105554607,
     "d_man_f": 16.93289402072938,
     "d_man_o": 29.00835769032299,
-    "case_name": "best_overall_2e6_Ainjf_19mar2021"
+    "case_name": "best_overall_2para_19mar2021"
 }

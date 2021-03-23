@@ -9,7 +9,7 @@
 
 
 
- problem  case=test_case_1 o/f=5.5,
+ problem  case=best_overall_2para_19mar2021 o/f=5.5,
        rocket  frozen nfz=1
    p,bar=30.0,
    pi/p=31.4,
@@ -127,7 +127,7 @@
            THEORETICAL ROCKET PERFORMANCE ASSUMING FROZEN COMPOSITION
 
  Pin =   435.1 PSIA
- CASE = test_case_1    
+ CASE = best_overall_2p
 
              REACTANT                    WT FRACTION      ENERGY      TEMP
                                           (SEE NOTE)     KJ/KG-MOL      K  

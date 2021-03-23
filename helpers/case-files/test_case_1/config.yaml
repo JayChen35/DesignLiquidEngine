@@ -32,7 +32,7 @@ ox: # Oxidizer (nitrous oxide) properties
     - 0.9 # Leave array empty/as zero if no propellant valves
     - 0.9
     - 0.9
-  injector_area : 2.0e-04 # [m^2] [null] Total injector orifice area
+  injector_area : 1.0e-04 # [m^2] [null] Total injector orifice area
   Cd_injector   : 0.9     # [~] Discharge coefficient (of injector orifices)
   V_tank        : 8       # [L] Propellant tank volume (around 60 cubic feet)
   # V_l           : null    # [L] [null] Liquid nitrous volume 
@@ -89,8 +89,8 @@ rho_f : 789    # [kg/m^3] Density of fuel
 delta_p : 25.0 # [%] Percent of injector/chamber dP
 min_d_o : 2.00 # [mm] Minimum allowable diameter of oxidizer orifices
 min_d_f : 1.00 # [mm] Minimum allowable diameter of fuel orifices
-max_n_o : 40   # [~] Maximum allowable number of oxidizer orifices 
-max_n_f : 40   # [~] Maximum allowable number of fuel orifices 
+max_n_o : 32   # [~] Maximum allowable number of oxidizer orifices 
+max_n_f : 32   # [~] Maximum allowable number of fuel orifices 
 
 #-------PropSim Runtime Parameters-------
 mode:

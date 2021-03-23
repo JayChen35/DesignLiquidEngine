@@ -37,24 +37,29 @@ def print_seperator(string: str, key=lambda: 30):
     print((len(string) % 2)*'-' + '{:-^{width}}'.format(string, width=key()))
 
 
+def print_dict(data: dict):
+    for key, val in data.items():
+        print(f"{key} = {val}")
+
+
 def get_exit_pressure(h: int or float):
     """
     Sourced from NASA Glenn Research Center's Earth Atmosphere Model.
-    Computes and sets the ambient pressure, P3, based on inputted altitude (meters).
-    P3 has units in pascals. Note: The intermediate temperature calculations use Celsius.
+    Computes and sets the ambient pressure, P_3, based on inputted altitude (meters).
+    P_3 has units in pascals. Note: The intermediate temperature calculations use Celsius.
     :param h: Altitude, in meters.
-    :return P3: Ambient pressure at altitude, in pascals.
+    :return P_3: Ambient pressure at altitude, in pascals.
     """
     if (h >= 25000):  # Upper Stratosphere
         T = -131.21 + 0.00299 * h
-        P3 = (2.488 * ((T + 273.1) / 216.6) ** (-11.388))*1000
+        P_3 = (2.488 * ((T + 273.1) / 216.6) ** (-11.388))*1000
     elif (11000 < h < 25000):  # Lower Stratosphere
         T = -56.46
-        P3 = (22.65 * np.exp(1.73 - 0.000157 * h))*1000
+        P_3 = (22.65 * np.exp(1.73 - 0.000157 * h))*1000
     else: # Troposphere
         T = 15.04 - 0.00649 * h
-        P3 = (101.29 * ((T + 273.1) / 288.08) ** (5.256))*1000
-    return P3
+        P_3 = (101.29 * ((T + 273.1) / 288.08) ** (5.256))*1000
+    return P_3
 
 
 class Struct():

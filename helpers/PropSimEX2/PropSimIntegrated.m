@@ -161,7 +161,7 @@ function [] = PropSimIntegrated(json_path)
     inputs.T_amb = data.T_amb;
 
     % Ambient Pressure (Pa)
-    inputs.p_amb = data.P3;
+    inputs.p_amb = data.P_3;
 
     % Load Combustion Data
     inputs.comb_data = load('CombustionData_T1_N2O.mat'); 

@@ -12,8 +12,10 @@ import sys
 import time
 import datetime
 import platform
+import shutil
 from typing import Tuple
-from helpers.misc import get_exit_pressure, print_header
+from helpers.prelim import prelim_main
+from helpers.misc import get_exit_pressure, print_header, print_dict
 from helpers.cea import cea_main
 from helpers.nozzle import nozzle_main
 from helpers.injector import injector_main
@@ -46,7 +48,7 @@ def main(cmd_args: list) -> Tuple[dict, float, str]:
             temp_path = input("Please enter a file path or command: ")
         try:
             if temp_path == "":
-                temp_path = "./config.yaml"
+                temp_path = "config.yaml"
             elif temp_path == "0":
                 sys.exit(0)
             with open(temp_path, "r") as f:
@@ -60,10 +62,7 @@ def main(cmd_args: list) -> Tuple[dict, float, str]:
             print_header("Invalid file path. Please ensure the file path is typed correctly.")
             if contains_cmd_args: sys.exit(0)
     # Get ambient pressure given the input altitude
-    data["P3"] = get_exit_pressure(data["altitude"])
-    # Add precision to data type
-    data["ox"]["injector_area"] = np.float64(data["ox"]["injector_area"])
-    data["fuel"]["injector_area"] = np.float64(data["fuel"]["injector_area"])
+    data["P_3"] = get_exit_pressure(data["altitude"])
     # Get desired name of output/case files from user
     if not contains_cmd_args:
         temp_name = input("Enter the desired name of output/case files (press [ENTER] to use default): ")
@@ -74,6 +73,11 @@ def main(cmd_args: list) -> Tuple[dict, float, str]:
     # Change current working directory to ./helpers
     os.chdir("./helpers")
     start_time = time.perf_counter() # Start runtime timer after inputs are recieved
+    # Run preliminary rocket sizing
+    targets = prelim_main(data)
+    print_header("Recommended overall launch vehicle and engine parameters:")
+    print_dict(targets)
+    data = {**targets, **data} # Merging the two dictionaries
     # Run Chemical Equilibrium with Applications (CEA) interface code
     data, case_dir = cea_main(data, case_name)
     # Run nozzle design code (assuming quasi-1D isentropic flow)
@@ -85,8 +89,9 @@ def main(cmd_args: list) -> Tuple[dict, float, str]:
     # Compile output data into a summary
     design_dict, _ = compile_outputs(data, output_file_path)
     # Print calculation outputs
-    for key, val in design_dict.items():
-        print(f"{key} = {val}")
+    print_dict(design_dict)
+    # Copy configuration YAML file to the output directory
+    shutil.copy(f"../{temp_path}", f"{case_dir}/{temp_path}")
     return data, start_time, case_dir, output_file_path
 
 
