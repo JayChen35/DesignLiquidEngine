@@ -89,8 +89,8 @@ rho_f : 789    # [kg/m^3] Density of fuel
 delta_p : 25.0 # [%] Percent of injector/chamber dP
 min_d_o : 2.00 # [mm] Minimum allowable diameter of oxidizer orifices
 min_d_f : 1.00 # [mm] Minimum allowable diameter of fuel orifices
-max_n_o : 32   # [~] Maximum allowable number of oxidizer orifices 
-max_n_f : 32   # [~] Maximum allowable number of fuel orifices 
+max_n_o : 40   # [~] Maximum allowable number of oxidizer orifices 
+max_n_f : 40   # [~] Maximum allowable number of fuel orifices 
 
 #-------PropSim Runtime Parameters-------
 mode:

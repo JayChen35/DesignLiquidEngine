@@ -111,8 +111,8 @@ def nozzle_main(data: dict) -> dict:
     temp_Ac = At * data["cont_ratio"] # Contraction ratio, nominally 8
     temp_Rc = np.sqrt((temp_Ac) / np.pi)
     temp_Dc = 2*temp_Rc
-    # Round chamber diameter to a standard size (intervals of 0.25)
-    Dc_i = np.ceil(temp_Dc*m_to_in*4)/4 
+    # Round chamber diameter to a standard size (intervals of 0.5)
+    Dc_i = np.ceil(temp_Dc*m_to_in*2)/2 
     Rc = (Dc_i/m_to_in)/2
     Ac = np.pi*(Rc**2)
     Lc = ((At)*Lstar) / (Ac)

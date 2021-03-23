@@ -25,7 +25,7 @@ def prelim_main(data: dict) -> dict:
     burn_time = impulse/thrust
     # Set to data dictionary ("x" denotes "target")
     targets["x_delta_v"]   = req_delta_v
-    targets["prop_mass"]   = prop_mass
+    targets["x_prop_mass"] = prop_mass
     targets["x_impulse"]   = impulse
     targets["x_thrust"]    = thrust
     targets["x_burn_time"] = burn_time
