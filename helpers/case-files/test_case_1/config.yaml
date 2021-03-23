@@ -11,7 +11,7 @@ thrust   : null    # [N] [null] Thrust
 of_ratio : 5.5     # [~] Oxidizer-to-fuel ratio
 P_0      : 3.0e+06 # [Pa] Chamber pressure
 altitude : 500     # [m] Operational altitude
-frozen   : true    # [~] Frozen/equilibrium combusion
+frozen   : true    # [~] Frozen/equilibrium combustion
 T_amb    : 300     # [K] Ambient temperature
 Lstar    : 1.25    # [m] Mixing length
 
@@ -32,11 +32,11 @@ ox: # Oxidizer (nitrous oxide) properties
     - 0.9 # Leave array empty/as zero if no propellant valves
     - 0.9
     - 0.9
-  injector_area : 9.0e-03 # [m^2] [null] Total injector orifice area
-  Cd_injector   : 0.9     # [~] Dischrge coefficient (of injector orifices)
+  injector_area : 1.0e-04 # [m^2] [null] Total injector orifice area
+  Cd_injector   : 0.9     # [~] Discharge coefficient (of injector orifices)
   V_tank        : 8       # [L] Propellant tank volume (around 60 cubic feet)
   # V_l           : null    # [L] [null] Liquid nitrous volume 
-  V_l           : 4.0     # [L] 3.1621
+  V_l           : 4.5     # [L] 3.1621
   tank_id       : 7       # [in] Tank inner diameter
   h_offset_tank : 2       # [in] Distance from bottom of tank to injector
   d_flowline    : 0.5     # [in] Main flow line diameter
@@ -53,8 +53,8 @@ fuel: # Fuel (95% ethyl alcohol) properties
   cv_type: 0 # Arrangement of valves; 0 = series, 1 = parallel
   valve_cvs: # Leave array empty/as zero if no propellant valves
     - 0.9
-  injector_area : 3.4e-06 # [m^2] [null] Total injector orifice area
-  Cd_injector   : 0.88    # [~] Dischrge coefficient (of injector orifices)
+  injector_area : 8.0e-06 # [m^2] [null] Total injector orifice area
+  Cd_injector   : 0.88    # [~] Discharge coefficient (of injector orifices)
   V_tank        : 4       # [L] Propellant tank volume (around 30 cubic feet)
   # V_l           : null    # [L] [null] Liquid nitrous volume
   V_l           : 1.0     # [L] 0.4215
@@ -64,7 +64,7 @@ fuel: # Fuel (95% ethyl alcohol) properties
   T_tank        : 300     # [K] Tank temperature
 fuel_pressurant: # Properties for the gaseous oxidizer pressurant (nitrous)
   gas_properties : 0 # 0 = nitrogen, 1 = helium (more inert gases will be added later)
-  set_pressure : 900 # [psi] Set regulator pressure between COPV and propellant tank
+  set_pressure : 490 # [psi] Set regulator pressure between COPV and propellant tank
   storage_initial_pressure : 0 # [psi] Initial storage pressure of pressurant; 0 = off
   tank_volume : 0 # [L] Pressurant storage tank volume
   flow_CdA : 6.4e-05 # [m^2] CdA of flow between storage and propellant tank
@@ -87,8 +87,10 @@ rho_o : 772.75 # [kg/m^3] Density of oxidizer
 rho_f : 789    # [kg/m^3] Density of fuel
 # Injector parameters
 delta_p : 25.0 # [%] Percent of injector/chamber dP
-min_d_o : 3.00 # [mm] Diameter of oxidizer orifices
-min_d_f : 1.00 # [mm] Diameter of fuel orifices
+min_d_o : 2.00 # [mm] Minimum allowable diameter of oxidizer orifices
+min_d_f : 1.00 # [mm] Minimum allowable diameter of fuel orifices
+max_n_o : 32   # [~] Maximum allowable number of oxidizer orifices 
+max_n_f : 32   # [~] Maximum allowable number of fuel orifices 
 
 #-------PropSim Runtime Parameters-------
 mode:

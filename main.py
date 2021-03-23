@@ -12,6 +12,7 @@ import sys
 import time
 import datetime
 import platform
+import shutil
 from typing import Tuple
 from helpers.prelim import prelim_main
 from helpers.misc import get_exit_pressure, print_header, print_dict
@@ -47,7 +48,7 @@ def main(cmd_args: list) -> Tuple[dict, float, str]:
             temp_path = input("Please enter a file path or command: ")
         try:
             if temp_path == "":
-                temp_path = "./config.yaml"
+                temp_path = "config.yaml"
             elif temp_path == "0":
                 sys.exit(0)
             with open(temp_path, "r") as f:
@@ -89,6 +90,8 @@ def main(cmd_args: list) -> Tuple[dict, float, str]:
     design_dict, _ = compile_outputs(data, output_file_path)
     # Print calculation outputs
     print_dict(design_dict)
+    # Copy configuration YAML file to the output directory
+    shutil.copy(f"../{temp_path}", f"{case_dir}/{temp_path}")
     return data, start_time, case_dir, output_file_path
 
 

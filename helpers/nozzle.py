@@ -75,6 +75,7 @@ def nozzle_main(data: dict) -> dict:
     """ Calculates nozzle parameters. """
     g_0 = 9.80665 # [m/s^2] Gravitational acceleration constant
     R_u = 8314.4621 # [J*kmol^-1*K^-1] Universal gas constant
+    m_to_in = 39.3701 # [ft/m] Meters to inches conversion
 
     F_thrust = data["x_thrust"]
     P_0 = data["P_0"]
@@ -106,8 +107,14 @@ def nozzle_main(data: dict) -> dict:
     Ae = ER * At
     Rt = np.sqrt(At/np.pi)
     Re = np.sqrt(Ae/np.pi)
-    Ac = At * data["cont_ratio"] # Contraction ratio, nominally 8
-    Rc = np.sqrt((Ac) / np.pi)
+    # Minimum chamber area according to contration ratio
+    temp_Ac = At * data["cont_ratio"] # Contraction ratio, nominally 8
+    temp_Rc = np.sqrt((temp_Ac) / np.pi)
+    temp_Dc = 2*temp_Rc
+    # Round chamber diameter to a standard size (intervals of 0.25)
+    Dc_i = np.ceil(temp_Dc*m_to_in*4)/4 
+    Rc = (Dc_i/m_to_in)/2
+    Ac = np.pi*(Rc**2)
     Lc = ((At)*Lstar) / (Ac)
     Ldn = ((Re)-(Rt)) / (np.tan(np.deg2rad(15)))
     Lcn = ((Rc)-(Rt)) / (np.tan(np.deg2rad(45)))
@@ -129,6 +136,7 @@ def nozzle_main(data: dict) -> dict:
     data["nozzle"]["Re"]   = Re
     data["nozzle"]["Ac"]   = Ac
     data["nozzle"]["Rc"]   = Rc
+    data["nozzle"]["Dc_i"] = Dc_i # [in] Diameter of chamber in inches
     data["nozzle"]["Lc"]   = Lc
     data["nozzle"]["Ldn"]  = Ldn
     data["nozzle"]["Lcn"]  = Lcn
